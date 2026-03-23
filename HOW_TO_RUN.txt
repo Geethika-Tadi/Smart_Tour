@@ -1,0 +1,31 @@
+========================================
+   SMARTTOUR — HOW TO RUN (100% FREE)
+   Powered by Groq AI (Llama 3)
+========================================
+
+✅ WORKS WITH VS CODE LIVE SERVER — FREE!
+
+STEP 1 — Get FREE Groq API Key (30 seconds)
+   1. Go to: https://console.groq.com
+   2. Sign up with Google/GitHub (free)
+   3. Click "API Keys" → "Create API Key"
+   4. Copy the key (starts with gsk_...)
+
+STEP 2 — Add your API key to index.html
+   Open index.html in VS Code
+   Press Ctrl+F and search:
+       YOUR_GROQ_KEY_HERE
+   Replace it like this:
+       var GROQ_API_KEY = 'gsk_your_key_here';
+   Press Ctrl+S to save
+
+STEP 3 — Open with Live Server
+   Right-click index.html in VS Code
+   Click "Open with Live Server"
+   App opens at http://127.0.0.1:5500
+
+========================================
+   FREE LIMITS: 14,400 requests/day
+   No credit card needed!
+   LOGIN: any email + any 4-char password
+========================================

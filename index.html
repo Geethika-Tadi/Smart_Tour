@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Tour Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', sans-serif; background: #0f1923; min-height: 100vh; }
+        .page { display: none; min-height: 100vh; }
+
+        /* LOGIN */
+        #loginPage {
+            background: linear-gradient(135deg, rgba(15,25,35,0.85), rgba(10,40,60,0.9)),
+                        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80') center/cover no-repeat;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        .login-logo { font-family: 'Playfair Display', serif; font-size: 42px; color: #fff; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+        .login-tagline { color: #a8d8ea; font-size: 15px; margin-bottom: 36px; letter-spacing: 3px; text-transform: uppercase; }
+        .login-card { background: rgba(255,255,255,0.07); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 44px 40px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .login-card input { width: 100%; padding: 13px 18px; margin-bottom: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: #fff; font-size: 15px; font-family: 'Nunito', sans-serif; outline: none; transition: border 0.3s; }
+        .login-card input::placeholder { color: rgba(255,255,255,0.5); }
+        .login-card input:focus { border-color: #56c2f5; }
+        .btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, #0097d6, #00c4a7); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; font-family: 'Nunito', sans-serif; cursor: pointer; letter-spacing: 1px; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,151,214,0.5); }
+        .error { color: #ff6b6b; font-size: 13px; margin-top: 10px; text-align: center; }
+
+        /* DASHBOARD */
+        #dashboardPage { background: #0f1923; }
+        .dash-hero { position: relative; height: 320px; background: url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80') center/cover no-repeat; display: flex; align-items: flex-end; padding: 32px 40px; }
+        .dash-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,25,35,1) 0%, rgba(15,25,35,0.4) 60%, transparent 100%); }
+        .dash-hero-content { position: relative; z-index: 1; }
+        .dash-hero-content h2 { font-family: 'Playfair Display', serif; font-size: 36px; color: #fff; margin-bottom: 6px; }
+        .dash-hero-content p { color: #a8d8ea; font-size: 15px; }
+        .dash-body { padding: 32px 40px; }
+        .dash-destinations { display: flex; gap: 20px; margin-bottom: 36px; overflow-x: auto; padding-bottom: 8px; }
+        .dest-card { flex: 0 0 200px; border-radius: 16px; overflow: hidden; position: relative; height: 140px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+        .dest-card:hover { transform: scale(1.06); box-shadow: 0 12px 30px rgba(0,151,214,0.4); }
+        .dest-card img { width: 100%; height: 100%; object-fit: cover; }
+        .dest-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%); }
+        .dest-label { position: absolute; bottom: 12px; left: 14px; color: #fff; font-weight: 700; font-size: 15px; z-index: 1; }
+        .section-title { font-family: 'Playfair Display', serif; color: #fff; font-size: 22px; margin-bottom: 16px; }
+        .dash-cta-section { background: linear-gradient(135deg, rgba(0,151,214,0.15), rgba(0,196,167,0.15)); border: 1px solid rgba(86,194,245,0.2); border-radius: 20px; padding: 32px; display: flex; align-items: center; justify-content: space-between; }
+        .dash-cta-section h3 { font-family: 'Playfair Display', serif; font-size: 26px; color: #fff; margin-bottom: 8px; }
+        .dash-cta-section p { color: #a8c8d8; font-size: 14px; max-width: 400px; }
+        .btn-cta { padding: 14px 32px; background: linear-gradient(135deg, #0097d6, #00c4a7); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: 'Nunito', sans-serif; cursor: pointer; white-space: nowrap; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,151,214,0.4); }
+
+        /* DESTINATION DETAIL PAGE */
+        #destDetailPage { background: #0f1923; }
+        .dest-detail-hero { position: relative; height: 280px; background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 28px 36px; }
+        .dest-detail-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,25,35,1) 0%, rgba(15,25,35,0.3) 60%, transparent 100%); }
+        .dest-detail-hero-content { position: relative; z-index: 1; }
+        .dest-detail-hero-content h2 { font-family: 'Playfair Display', serif; font-size: 38px; color: #fff; margin-bottom: 4px; }
+        .dest-detail-hero-content p { color: #a8d8ea; font-size: 14px; }
+        .dest-detail-body { padding: 28px 36px; max-width: 900px; margin: 0 auto; }
+
+        .budget-selector { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .budget-btn { padding: 10px 22px; border-radius: 30px; border: 2px solid rgba(86,194,245,0.3); background: rgba(255,255,255,0.05); color: #a8d8ea; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .budget-btn:hover, .budget-btn.active { background: linear-gradient(135deg, #0097d6, #00c4a7); border-color: transparent; color: #fff; transform: translateY(-2px); }
+
+        .person-selector { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+        .person-selector label { color: #a8c8d8; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .person-controls { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(86,194,245,0.25); border-radius: 30px; padding: 6px 16px; }
+        .person-btn { background: linear-gradient(135deg, #0097d6, #00c4a7); border: none; color: #fff; font-size: 18px; font-weight: 700; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; line-height: 1; }
+        .person-btn:hover { transform: scale(1.15); }
+        .person-count { color: #fff; font-size: 20px; font-weight: 700; min-width: 28px; text-align: center; }
+        .person-label-sub { color: #7ab8d4; font-size: 12px; }
+        .total-cost-bar { background: linear-gradient(135deg, rgba(0,151,214,0.15), rgba(0,196,167,0.15)); border: 1px solid rgba(86,194,245,0.3); border-radius: 14px; padding: 16px 20px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center; }
+        .total-cost-bar .tc-label { color: #a8d8ea; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .total-cost-bar .tc-value { color: #00c4a7; font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif; }
+        .total-cost-bar .tc-note { color: #7ab8d4; font-size: 11px; margin-top: 2px; }
+        .detail-section { margin-bottom: 28px; }
+
+        /* CUSTOM BUDGET INPUT */
+        .custom-budget-row { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .custom-budget-row label { color: #a8c8d8; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .custom-budget-input { background: rgba(255,255,255,0.08); border: 2px solid rgba(86,194,245,0.3); border-radius: 12px; padding: 10px 16px; color: #fff; font-size: 15px; font-family: 'Nunito', sans-serif; outline: none; width: 180px; transition: border 0.3s; }
+        .custom-budget-input:focus { border-color: #56c2f5; background: rgba(255,255,255,0.12); }
+        .custom-budget-input::placeholder { color: rgba(255,255,255,0.35); }
+        .btn-compare { padding: 10px 22px; background: linear-gradient(135deg, #0097d6, #00c4a7); border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 700; font-family: 'Nunito', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-compare:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,151,214,0.4); }
+
+        /* COMPARISON TABLE */
+        .compare-section { margin-bottom: 32px; }
+        .compare-section-title { font-family: 'Playfair Display', serif; color: #fff; font-size: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .compare-table { width: 100%; border-collapse: collapse; }
+        .compare-table th { background: rgba(0,151,214,0.2); color: #a8d8ea; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px; text-align: left; border-bottom: 2px solid rgba(86,194,245,0.2); }
+        .compare-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); color: #fff; font-size: 14px; vertical-align: middle; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table tr:hover td { background: rgba(255,255,255,0.03); }
+        .platform-logo { display: flex; align-items: center; gap: 10px; }
+        .platform-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .platform-name { font-weight: 700; font-size: 14px; }
+        .price-cell { font-weight: 700; font-size: 16px; }
+        .our-row td { background: rgba(0,196,167,0.08) !important; }
+        .our-row .price-cell { color: #00c4a7; font-size: 18px; }
+        .badge-best { background: linear-gradient(135deg, #00c4a7, #0097d6); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; margin-left: 8px; letter-spacing: 0.5px; }
+        .badge-high { background: rgba(255,107,107,0.2); color: #ff6b6b; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; margin-left: 8px; }
+        .savings-bar { background: rgba(0,196,167,0.1); border: 1px solid rgba(0,196,167,0.3); border-radius: 12px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+        .savings-text { color: #00c4a7; font-weight: 700; font-size: 15px; }
+        .savings-sub { color: #7ab8d4; font-size: 12px; margin-top: 2px; }
+        .detail-section-title { font-family: 'Playfair Display', serif; color: #fff; font-size: 20px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+        .detail-section-title span { font-size: 22px; }
+
+        .cards-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+        .info-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 18px; transition: border-color 0.2s, transform 0.2s; }
+        .info-card:hover { border-color: rgba(86,194,245,0.4); transform: translateY(-3px); }
+        .info-card .card-name { color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+        .info-card .card-detail { color: #7ab8d4; font-size: 13px; margin-bottom: 4px; }
+        .info-card .card-price { color: #00c4a7; font-weight: 700; font-size: 14px; margin-top: 8px; }
+        .info-card .card-badge { display: inline-block; background: rgba(0,196,167,0.15); border: 1px solid rgba(0,196,167,0.3); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: #00c4a7; font-weight: 700; margin-top: 6px; }
+
+        .transport-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 18px; display: flex; align-items: center; gap: 16px; transition: border-color 0.2s, transform 0.2s; }
+        .transport-card:hover { border-color: rgba(86,194,245,0.4); transform: translateY(-3px); }
+        .transport-icon { font-size: 32px; }
+        .transport-info .t-name { color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+        .transport-info .t-detail { color: #7ab8d4; font-size: 13px; }
+        .transport-info .t-price { color: #00c4a7; font-weight: 700; font-size: 14px; margin-top: 6px; }
+
+        .btn-back-dash { padding: 12px 28px; background: transparent; border: 2px solid rgba(86,194,245,0.4); color: #56c2f5; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Nunito', sans-serif; cursor: pointer; transition: all 0.2s; margin-bottom: 28px; }
+        .btn-back-dash:hover { background: rgba(0,151,214,0.15); transform: translateY(-2px); }
+
+        .no-data { color: #7ab8d4; font-size: 14px; padding: 16px; background: rgba(255,255,255,0.04); border-radius: 12px; text-align: center; }
+
+        /* PLAN PAGE */
+        #planPage { background: linear-gradient(170deg, rgba(15,25,35,0.95), rgba(10,40,60,0.97)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80') center/cover no-repeat fixed; align-items: center; justify-content: center; padding: 40px 20px; }
+        .plan-card { background: rgba(139,137,137,0.06); backdrop-filter: blur(16px); border: 1px solid rgba(212,196,200,0.792); border-radius: 24px; padding: 44px 40px; width: 420px; box-shadow: 0 24px 60px rgba(15,15,15,0.724); }
+        .plan-card h2 { font-family: 'Playfair Display', serif; color: #fff; font-size: 30px; margin-bottom: 6px; }
+        .plan-card .subtitle { color: #7ab8d4; font-size: 13px; margin-bottom: 30px; letter-spacing: 2px; text-transform: uppercase; }
+        .field-label { color: #a8c8d8; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+        .plan-card input { width: 100%; padding: 13px 16px; margin-bottom: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; font-family: 'Nunito', sans-serif; outline: none; transition: border 0.3s; }
+        .plan-card input::placeholder { color: rgba(255,255,255,0.35); }
+        .plan-card input:focus { border-color: #56c2f5; background: rgba(255,255,255,0.12); }
+
+        /* PROCESSING */
+        #processingPage { background: #0f1923; flex-direction: column; align-items: center; justify-content: center; }
+        .proc-img { width: 280px; height: 180px; border-radius: 20px; object-fit: cover; margin-bottom: 30px; opacity: 0.7; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+        #processingPage h2 { font-family: 'Playfair Display', serif; color: #fff; font-size: 28px; margin-bottom: 8px; }
+        #processingPage p { color: #7ab8d4; margin-bottom: 28px; font-size: 14px; }
+        .loader { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #0097d6; border-radius: 50%; width: 50px; height: 50px; animation: spin 0.9s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* RESULT */
+        #resultPage { background: linear-gradient(135deg, rgba(10,25,40,0.85), rgba(5,30,55,0.90)), url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=80') center/cover no-repeat fixed; padding: 40px 20px; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .result-banner { width: 100%; max-width: 560px; border-radius: 20px; overflow: hidden; position: relative; margin-bottom: 24px; box-shadow: 0 16px 50px rgba(0,0,0,0.5); }
+        .result-banner img { width: 100%; height: 200px; object-fit: cover; display: block; }
+        .result-banner-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,151,214,0.55), rgba(0,196,167,0.55)); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 26px; color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,0.5); }
+        .result-card { background: rgba(255,255,255,0.07); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 32px; width: 100%; max-width: 560px; margin-bottom: 20px; box-shadow: 0 16px 50px rgba(0,0,0,0.4); }
+        .result-card h2 { font-family: 'Playfair Display', serif; color: #fff; font-size: 26px; margin-bottom: 20px; }
+        .result-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .result-row:last-of-type { border-bottom: none; }
+        .result-row .label { color: #7ab8d4; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        .result-row .value { color: #fff; font-weight: 700; font-size: 16px; }
+        .features-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 20px; }
+        .feature-item { background: linear-gradient(135deg, rgba(0,151,214,0.15), rgba(0,196,167,0.15)); border: 1px solid rgba(86,194,245,0.25); border-radius: 12px; padding: 16px 12px; text-align: center; }
+        .feature-item .icon { font-size: 24px; margin-bottom: 8px; }
+        .feature-item .feat-label { color: #a8d8ea; font-size: 12px; font-weight: 700; }
+        .btn-back { padding: 14px 40px; background: transparent; border: 2px solid #0097d6; color: #56c2f5; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: 'Nunito', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .btn-back:hover { background: rgba(0,151,214,0.15); transform: translateY(-2px); }
+    
+        /* PERSONS CONTROL */
+        .persons-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .person-btn { background: linear-gradient(135deg, #0097d6, #00c4a7); border: none; color: #fff; font-size: 20px; font-weight: 700; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; flex-shrink: 0; }
+        .person-btn:hover { transform: scale(1.15); }
+        .persons-display { background: rgba(255,255,255,0.08); border: 1px solid rgba(86,194,245,0.3); border-radius: 12px; padding: 8px 24px; text-align: center; min-width: 90px; }
+        .persons-num { color: #fff; font-size: 22px; font-weight: 700; display: block; line-height: 1; }
+        .persons-lbl { color: #7ab8d4; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+        .per-person-hint { color: #7ab8d4; font-size: 12px; margin-top: -12px; margin-bottom: 20px; padding: 7px 12px; background: rgba(0,196,167,0.08); border-radius: 8px; border-left: 3px solid #00c4a7; }
+
+        /* RESULT EXPANDABLE SECTIONS */
+        .result-tabs { display: flex; gap: 10px; margin: 20px 0 0 0; flex-wrap: wrap; }
+        .result-tab-btn { flex: 1; min-width: 100px; padding: 12px 10px; border-radius: 12px; border: 2px solid rgba(86,194,245,0.25); background: rgba(255,255,255,0.05); color: #a8d8ea; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .result-tab-btn:hover { border-color: rgba(86,194,245,0.6); background: rgba(86,194,245,0.08); }
+        .result-tab-btn.active { background: linear-gradient(135deg, #0097d6, #00c4a7); border-color: transparent; color: #fff; }
+        .result-tab-btn .tab-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+        .result-section { display: none; margin-top: 16px; }
+        .result-section.open { display: block; }
+        .res-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; transition: border-color 0.2s; }
+        .res-card:hover { border-color: rgba(86,194,245,0.4); }
+        .res-card-name { color: #fff; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+        .res-card-detail { color: #7ab8d4; font-size: 13px; margin-bottom: 4px; }
+        .res-card-price { color: #00c4a7; font-weight: 700; font-size: 14px; margin-top: 6px; }
+        .res-card-badge { display: inline-block; background: rgba(0,196,167,0.15); border: 1px solid rgba(0,196,167,0.3); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: #00c4a7; font-weight: 700; margin-top: 4px; }
+        .res-transport-card { display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px 18px; margin-bottom: 10px; }
+        .res-t-icon { font-size: 28px; }
+        .res-t-name { color: #fff; font-weight: 700; font-size: 14px; }
+        .res-t-detail { color: #7ab8d4; font-size: 12px; margin-top: 2px; }
+        .res-t-price { color: #00c4a7; font-weight: 700; font-size: 15px; margin-left: auto; text-align: right; }
+        .res-t-duration { color: #7ab8d4; font-size: 11px; margin-top: 2px; }
+        .no-data-msg { color: #7ab8d4; font-size: 13px; padding: 20px; text-align: center; background: rgba(255,255,255,0.03); border-radius: 12px; }
+
+        /* STAY PREFERENCE TOGGLE */
+        .stay-toggle-row { display: flex; gap: 12px; margin-bottom: 20px; }
+        .stay-option { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); cursor: pointer; transition: all 0.25s; text-align: center; }
+        .stay-option:hover { border-color: rgba(86,194,245,0.5); background: rgba(86,194,245,0.07); }
+        .stay-option.selected { border-color: #00c4a7; background: rgba(0,196,167,0.12); box-shadow: 0 0 0 1px rgba(0,196,167,0.3); }
+        .stay-option .stay-icon { font-size: 28px; }
+        .stay-option .stay-label { color: #fff; font-size: 13px; font-weight: 700; }
+        .stay-option .stay-sub { color: #7ab8d4; font-size: 11px; }
+        .stay-option.selected .stay-label { color: #00c4a7; }
+        .stay-savings-note { font-size: 11px; color: #00c4a7; margin-top: 4px; background: rgba(0,196,167,0.1); border-radius: 6px; padding: 4px 8px; display: none; }
+        .stay-option.selected .stay-savings-note { display: block; }
+
+        /* TRIP SUMMARY CARD */
+        .trip-summary-wrap { width: 100%; max-width: 700px; margin-bottom: 20px; }
+        .trip-summary-card { background: #0f1f2e; border: 1px solid rgba(86,194,245,0.2); border-radius: 16px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+        .trip-summary-header { background: linear-gradient(135deg, #0f2a3a, #0a1e2e); padding: 14px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(86,194,245,0.15); }
+        .trip-summary-header .ts-icon { font-size: 18px; }
+        .trip-summary-header h3 { font-family: 'Playfair Display', serif; color: #fff; font-size: 18px; }
+        .ts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .ts-cell { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); border-right: 1px solid rgba(255,255,255,0.06); }
+        .ts-cell:nth-child(even) { border-right: none; }
+        .ts-cell:nth-last-child(-n+2) { border-bottom: none; }
+        .ts-cell.full-width { grid-column: 1 / -1; border-right: none; }
+        .ts-label { color: #56c2f5; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+        .ts-value { color: #e0f0ff; font-size: 13px; line-height: 1.55; font-weight: 600; }
+        .ts-value.highlight { color: #00c4a7; font-size: 20px; font-weight: 700; font-family: 'Playfair Display', serif; }
+        .ts-value.warn { color: #f4a261; font-weight: 700; }
+        .ts-loading { display: flex; align-items: center; gap: 10px; color: #7ab8d4; font-size: 13px; padding: 24px 20px; }
+
+        /* TRANSPORT SELECTION PAGE */
+        #transportSelectPage { background: #0f1923; flex-direction: column; align-items: center; padding: 40px 20px 60px; min-height: 100vh; }
+        .ts-page-wrap { width: 100%; max-width: 600px; }
+        .ts-page-back { background: transparent; border: none; color: #7ab8d4; font-size: 13px; font-family: 'Nunito',sans-serif; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 6px; padding: 0; }
+        .ts-page-back:hover { color: #fff; }
+        .ts-page-title { font-family: 'Playfair Display', serif; color: #fff; font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .ts-page-meta { color: #56c2f5; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+        .ts-page-sub { color: #7ab8d4; font-size: 13px; margin-bottom: 20px; }
+        .ts-no-flight { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.25); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #ff8a8a; margin-bottom: 16px; }
+        .ts-section-label { color: #56c2f5; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 20px 0 10px; display: flex; align-items: center; gap: 10px; }
+        .ts-section-line { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+        .ts-tr-card { background: #0d1c2a; border: 1.5px solid rgba(255,255,255,0.08); border-radius: 14px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; overflow: hidden; }
+        .ts-tr-card:hover { border-color: rgba(86,194,245,0.5); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+        .ts-tr-card.picked { border-color: #00c4a7; background: rgba(0,196,167,0.07); box-shadow: 0 0 0 1px rgba(0,196,167,0.2); }
+        .ts-tr-inner { padding: 16px 18px 14px; }
+        .ts-tr-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+        .ts-tr-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .ts-tr-mid { flex: 1; }
+        .ts-tr-name { color: #fff; font-weight: 700; font-size: 15px; }
+        .ts-tr-sub { color: #7ab8d4; font-size: 12px; margin-top: 2px; }
+        .ts-tr-price-col { text-align: right; }
+        .ts-tr-price { color: #00c4a7; font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif; line-height: 1; }
+        .ts-tr-price-label { color: #7ab8d4; font-size: 10px; margin-top: 3px; }
+        .ts-tr-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+        .ts-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 20px; padding: 4px 11px; font-size: 11px; font-weight: 700; border: 1px solid; }
+        .ts-chip.comfort  { background: rgba(86,194,245,0.1); border-color: rgba(86,194,245,0.3); color: #56c2f5; }
+        .ts-chip.budget   { background: rgba(0,196,167,0.1);  border-color: rgba(0,196,167,0.3);  color: #00c4a7; }
+        .ts-chip.fast     { background: rgba(155,93,229,0.1); border-color: rgba(155,93,229,0.3); color: #b87fff; }
+        .ts-chip.dur      { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #a8d8ea; }
+        .ts-chip.pct      { background: rgba(244,162,97,0.1); border-color: rgba(244,162,97,0.25); color: #f4a261; }
+        .ts-tr-footer { background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.07); padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .ts-tr-footer-label { color: #7ab8d4; font-size: 12px; }
+        .ts-tr-footer-val { color: #fff; font-weight: 700; font-size: 15px; }
+        .ts-tr-card.picked .ts-tr-footer-val { color: #00c4a7; }
+        .ts-local-box { background: rgba(0,151,214,0.07); border-left: 3px solid #0097d6; border-radius: 0 12px 12px 0; padding: 14px 16px; color: #a8d8ea; font-size: 13px; line-height: 1.7; margin-bottom: 20px; }
+        .ts-proceed-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #0097d6, #00c4a7); color: #fff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; font-family: 'Nunito',sans-serif; cursor: pointer; margin-top: 20px; transition: all 0.2s; display: none; }
+        .ts-proceed-btn.show { display: block; }
+        .ts-proceed-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,151,214,0.4); }
+        .ts-picked-bar { background: rgba(0,196,167,0.1); border: 1.5px solid rgba(0,196,167,0.35); border-radius: 12px; padding: 13px 18px; margin-bottom: 16px; display: none; align-items: center; gap: 10px; }
+        .ts-picked-bar.show { display: flex; }
+        .ts-picked-bar-text { color: #00c4a7; font-weight: 700; font-size: 13px; flex: 1; }
+        .ts-picked-bar-clear { color: #7ab8d4; font-size: 12px; cursor: pointer; text-decoration: underline; }
+        /* Budget insufficient warning */
+        .budget-warn-page { background: #0f1923; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; min-height: 100vh; }
+        .budget-warn-card { background: rgba(255,107,107,0.07); border: 2px solid rgba(255,107,107,0.3); border-radius: 20px; padding: 40px 36px; max-width: 500px; width: 100%; text-align: center; }
+        .budget-warn-icon { font-size: 56px; margin-bottom: 16px; }
+        .budget-warn-title { font-family: 'Playfair Display', serif; color: #ff6b6b; font-size: 26px; margin-bottom: 12px; }
+        .budget-warn-msg { color: #a8d8ea; font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+        .budget-warn-breakdown { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; text-align: left; }
+        .budget-warn-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+        .budget-warn-row:last-child { border-bottom: none; font-weight: 700; }
+        .budget-warn-row .bw-label { color: #7ab8d4; }
+        .budget-warn-row .bw-val { color: #fff; }
+        .budget-warn-row .bw-val.red { color: #ff6b6b; }
+        .budget-warn-row .bw-val.green { color: #00c4a7; }
+        .budget-warn-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .btn-warn-back { padding: 12px 28px; background: transparent; border: 2px solid rgba(86,194,245,0.4); color: #56c2f5; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Nunito',sans-serif; cursor: pointer; }
+        .btn-warn-proceed { padding: 12px 28px; background: linear-gradient(135deg, #0097d6, #00c4a7); color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Nunito',sans-serif; cursor: pointer; }
+        .tr-chooser-header { margin-bottom: 20px; }
+        .tr-chooser-title { font-family: 'Playfair Display', serif; color: #fff; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .tr-chooser-meta { color: #56c2f5; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .tr-chooser-sub { color: #7ab8d4; font-size: 13px; }
+        .tr-no-flight-notice { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.25); border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #ff8a8a; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .transport-section-label { color: #56c2f5; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 22px 0 8px; display: flex; align-items: center; gap: 10px; }
+        .tsl-line { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+
+        /* Individual transport card — matches screenshot exactly */
+        .tr-card { background: #0d1c2a; border: 1.5px solid rgba(255,255,255,0.08); border-radius: 14px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; overflow: hidden; }
+        .tr-card:hover { border-color: rgba(86,194,245,0.45); background: #101f30; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+        .tr-card.selected { border-color: #00c4a7; background: rgba(0,196,167,0.06); box-shadow: 0 0 0 1px rgba(0,196,167,0.2); }
+        .tr-card-inner { padding: 16px 18px 0; }
+
+        /* Top row: icon + name/sub + price */
+        .tr-card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+        .tr-card-icon { width: 38px; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .tr-card-main { flex: 1; }
+        .tr-card-name { color: #fff; font-weight: 700; font-size: 15px; line-height: 1.3; }
+        .tr-card-sub { color: #7ab8d4; font-size: 12px; margin-top: 2px; }
+        .tr-card-price-block { text-align: right; flex-shrink: 0; }
+        .tr-card-price { color: #00c4a7; font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif; line-height: 1; }
+        .tr-card-price-label { color: #7ab8d4; font-size: 10px; margin-top: 3px; }
+
+        /* Chips row */
+        .tr-card-chips { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+        .tr-chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 20px; padding: 4px 11px; font-size: 11px; font-weight: 700; border: 1px solid; white-space: nowrap; }
+        .tr-chip.comfort  { background: rgba(86,194,245,0.1);  border-color: rgba(86,194,245,0.3);  color: #56c2f5; }
+        .tr-chip.budget   { background: rgba(0,196,167,0.1);   border-color: rgba(0,196,167,0.3);   color: #00c4a7; }
+        .tr-chip.fast     { background: rgba(155,93,229,0.1);  border-color: rgba(155,93,229,0.3);  color: #b87fff; }
+        .tr-chip.duration { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #a8d8ea; }
+        .tr-chip.pct      { background: rgba(244,162,97,0.1);  border-color: rgba(244,162,97,0.25); color: #f4a261; }
+
+        /* Total both ways footer — solid separator line like screenshot */
+        .tr-card-footer { background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.07); padding: 11px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .tr-card-footer-label { color: #7ab8d4; font-size: 12px; }
+        .tr-card-footer-val { color: #fff; font-weight: 700; font-size: 15px; }
+        .tr-card.selected .tr-card-footer-val { color: #00c4a7; }
+
+        /* Selected confirmation bar */
+        .tr-selected-bar { background: rgba(0,196,167,0.1); border: 1.5px solid rgba(0,196,167,0.35); border-radius: 12px; padding: 13px 18px; margin-bottom: 18px; display: none; align-items: center; gap: 10px; }
+        .tr-selected-bar.show { display: flex; }
+        .tr-selected-bar-text { color: #00c4a7; font-weight: 700; font-size: 13px; flex: 1; }
+        .tr-selected-bar-clear { color: #7ab8d4; font-size: 12px; cursor: pointer; text-decoration: underline; white-space: nowrap; }
+        .tr-local-box { background: rgba(0,151,214,0.07); border-left: 3px solid #0097d6; border-radius: 0 12px 12px 0; padding: 14px 16px; margin-top: 6px; color: #a8d8ea; font-size: 13px; line-height: 1.7; }
+
+        /* AI PLAN RESULT STYLES */
+        .ai-badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(0,151,214,0.2), rgba(0,196,167,0.2)); border: 1px solid rgba(86,194,245,0.35); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #56c2f5; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.5px; }
+        .ai-dot { width: 7px; height: 7px; border-radius: 50%; background: #00c4a7; animation: pulse 1.5s infinite; display: inline-block; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+        .ai-status { color: #56c2f5; font-size: 13px; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
+        .ai-content { color: #c8e4f0; font-size: 14px; line-height: 1.8; }
+        .ai-content h3 { font-family: 'Playfair Display', serif; color: #fff; font-size: 18px; margin: 20px 0 10px; }
+        .ai-content h4 { color: #56c2f5; font-size: 15px; margin: 16px 0 8px; font-family: 'Nunito', sans-serif; }
+        .ai-content ul { padding-left: 18px; margin: 8px 0; }
+        .ai-content li { margin-bottom: 6px; color: #a8d8ea; }
+        .ai-content strong { color: #00c4a7; }
+        .ai-content .day-block { background: rgba(255,255,255,0.04); border: 1px solid rgba(86,194,245,0.15); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+        .ai-content .cost-badge { display: inline-block; background: rgba(0,196,167,0.12); border: 1px solid rgba(0,196,167,0.3); border-radius: 20px; padding: 2px 10px; font-size: 12px; color: #00c4a7; font-weight: 700; margin: 2px; }
+        .ai-content .tip-box { background: rgba(0,151,214,0.08); border-left: 3px solid #0097d6; border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: #a8d8ea; }
+        .ai-content .save-box { background: rgba(0,196,167,0.08); border-left: 3px solid #00c4a7; border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 12px 0; font-size: 13px; color: #a8d8ea; }
+        .tab-loading { display: flex; align-items: center; gap: 10px; color: #7ab8d4; font-size: 14px; padding: 20px 0; }
+        .mini-loader { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #0097d6; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.9s linear infinite; }
+        /* Extra result tabs for AI plan */
+        #resultPage .result-tabs { flex-wrap: wrap; }
+        .result-row .value.green { color: #00c4a7; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="page">
+    <div class="login-logo">✈ SmartTour</div>
+    <div class="login-tagline">Discover · Explore · Travel</div>
+    <div class="login-card">
+        <input type="email" id="email" placeholder="Email address">
+        <input type="password" id="password" placeholder="Password">
+        <button class="btn-primary" onclick="validateLogin()">Sign In</button>
+        <p id="errorMsg" class="error"></p>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboardPage" class="page">
+    <div class="dash-hero">
+        <div class="dash-hero-content">
+            <h2>Where to next?</h2>
+            <p>Explore top destinations and plan your perfect journey</p>
+        </div>
+    </div>
+    <div class="dash-body">
+        <p class="section-title">Popular Destinations</p>
+        <div class="dash-destinations">
+            <div class="dest-card" onclick="openDestination('agra')">
+                <img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400&q=80" alt="Agra">
+                <span class="dest-label">Agra</span>
+            </div>
+            <div class="dest-card" onclick="openDestination('mumbai')">
+                <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?w=400&q=80" alt="Mumbai">
+                <span class="dest-label">Mumbai</span>
+            </div>
+            <div class="dest-card" onclick="openDestination('goa')">
+                <img src="https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=400&q=80" alt="Goa">
+                <span class="dest-label">Goa</span>
+            </div>
+            <div class="dest-card" onclick="openDestination('kerala')">
+                <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&q=80" alt="Kerala">
+                <span class="dest-label">Kerala</span>
+            </div>
+            <div class="dest-card" onclick="openDestination('jaipur')">
+                <img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?w=400&q=80" alt="Jaipur">
+                <span class="dest-label">Jaipur</span>
+            </div>
+        </div>
+        <div class="dash-cta-section">
+            <div>
+                <h3>Plan Your Dream Trip</h3>
+                <p>Enter your destination, budget, and travel preferences — we'll handle the rest with a tailored itinerary just for you.</p>
+            </div>
+            <button class="btn-cta" onclick="goToPlan()">Plan New Trip →</button>
+        </div>
+    </div>
+</div>
+
+<!-- DESTINATION DETAIL PAGE -->
+<div id="destDetailPage" class="page">
+    <div class="dest-detail-hero" id="detailHero">
+        <div class="dest-detail-hero-content">
+            <h2 id="detailTitle">Agra</h2>
+            <p id="detailSubtitle">Choose your budget to see the best options</p>
+        </div>
+    </div>
+    <div class="dest-detail-body">
+        <button class="btn-back-dash" onclick="showPage('dashboardPage')">← Back to Destinations</button>
+
+        <p class="section-title" style="margin-bottom:14px;">Enter Your Budget & Compare</p>
+        <div class="custom-budget-row">
+            <label>💰 Your Budget (₹)</label>
+            <input type="number" class="custom-budget-input" id="customBudget" placeholder="e.g. 15000" min="1000">
+            <button class="btn-compare" onclick="runComparison()">Compare Platforms →</button>
+        </div>
+        <p class="section-title" style="margin-bottom:14px; font-size:16px; color:#7ab8d4;">Or pick a preset</p>
+        <div class="budget-selector">
+            <button class="budget-btn" onclick="setPresetBudget(5000)">₹5,000</button>
+            <button class="budget-btn" onclick="setPresetBudget(10000)">₹10,000</button>
+            <button class="budget-btn" onclick="setPresetBudget(20000)">₹20,000</button>
+            <button class="budget-btn" onclick="setPresetBudget(50000)">₹50,000</button>
+        </div>
+
+        <!-- COMPARISON SECTION -->
+        <div class="compare-section" id="compareSection" style="display:none;">
+            <div class="compare-section-title"><span>📊</span> Platform Price Comparison</div>
+            <table class="compare-table" id="compareTable">
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Hotel / Night</th>
+                        <th>Transport</th>
+                        <th>Total Est. Cost</th>
+                        <th>Verdict</th>
+                    </tr>
+                </thead>
+                <tbody id="compareBody"></tbody>
+            </table>
+            <div class="savings-bar" id="savingsBar">
+                <div>
+                    <div class="savings-text" id="savingsText"></div>
+                    <div class="savings-sub" id="savingsSub"></div>
+                </div>
+                <div style="font-size:28px;">💡</div>
+            </div>
+        </div>
+
+        <!-- PERSON SELECTOR -->
+        <div class="person-selector">
+            <label>👥 Travellers</label>
+            <div class="person-controls">
+                <button class="person-btn" onclick="changePerson(-1)">−</button>
+                <div>
+                    <div class="person-count" id="personCount">1</div>
+                    <div class="person-label-sub">person</div>
+                </div>
+                <button class="person-btn" onclick="changePerson(1)">+</button>
+            </div>
+        </div>
+
+        <!-- TOTAL COST BAR -->
+        <div class="total-cost-bar" id="totalCostBar" style="display:none;">
+            <div>
+                <div class="tc-label">Estimated Total Cost</div>
+                <div class="tc-note" id="totalCostNote"></div>
+            </div>
+            <div class="tc-value" id="totalCostValue">₹0</div>
+        </div>
+
+        <!-- PLACES TO VISIT -->
+        <div class="detail-section">
+            <div class="detail-section-title"><span>🗺️</span> Places to Visit</div>
+            <div class="cards-row" id="placesContainer"></div>
+        </div>
+
+        <!-- HOTELS -->
+        <div class="detail-section">
+            <div class="detail-section-title"><span>🏨</span> Affordable Hotels</div>
+            <div class="cards-row" id="hotelsContainer"></div>
+        </div>
+
+        <!-- TRANSPORT -->
+        <div class="detail-section">
+            <div class="detail-section-title"><span>🚗</span> Transport Options</div>
+            <div class="cards-row" id="transportContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- PLAN TRIP PAGE -->
+<div id="planPage" class="page">
+    <div class="plan-card">
+        <h2>Plan Your Trip</h2>
+        <p class="subtitle">AI will craft your real itinerary</p>
+        <div class="ai-badge"><span class="ai-dot"></span> Powered by Groq AI (Free)</div>
+
+        <div class="field-label">Travelling From (Source City)</div>
+        <input type="text" id="sourceCity" placeholder="e.g. Hyderabad, Chennai, Delhi">
+
+        <div class="field-label">Destination</div>
+        <input type="text" id="destination" placeholder="e.g. Goa, Manali, Jaipur">
+
+        <div class="field-label">Number of Days</div>
+        <input type="number" id="days" placeholder="e.g. 5" min="1">
+
+        <div class="field-label">Travel Style</div>
+        <select id="travelStyle" style="width:100%;padding:13px 16px;margin-bottom:20px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:15px;font-family:'Nunito',sans-serif;outline:none;">
+            <option value="budget" style="background:#1a2a3a;">🎒 Budget Backpacker</option>
+            <option value="comfort" selected style="background:#1a2a3a;">😊 Comfort Traveller</option>
+            <option value="luxury" style="background:#1a2a3a;">💎 Luxury Explorer</option>
+            <option value="family" style="background:#1a2a3a;">👨‍👩‍👧 Family Trip</option>
+            <option value="adventure" style="background:#1a2a3a;">🧗 Adventure Seeker</option>
+            <option value="spiritual" style="background:#1a2a3a;">🙏 Spiritual Journey</option>
+        </select>
+
+        <div class="field-label">Number of Persons</div>
+        <div class="persons-row">
+            <button class="person-btn" onclick="changePlanPersons(-1)">−</button>
+            <div class="persons-display">
+                <span class="persons-num" id="planPersonsCount">1</span>
+                <span class="persons-lbl" id="planPersonsLabel">person</span>
+            </div>
+            <button class="person-btn" onclick="changePlanPersons(1)">+</button>
+        </div>
+
+        <div class="field-label">Total Budget (₹) — for all persons</div>
+        <input type="number" id="budget" placeholder="e.g. 25000" oninput="updatePerPersonHint()">
+        <div class="per-person-hint" id="perPersonHint">Budget per person: —</div>
+
+        <div class="field-label">Stay Preference</div>
+        <div class="stay-toggle-row">
+            <div class="stay-option selected" id="stayHotel" onclick="selectStay('hotel')">
+                <div class="stay-icon">🏨</div>
+                <div class="stay-label">Hotel</div>
+                <div class="stay-sub">Booked accommodation</div>
+                <div class="stay-savings-note">Standard pricing</div>
+            </div>
+            <div class="stay-option" id="stayRelative" onclick="selectStay('relative')">
+                <div class="stay-icon">🏠</div>
+                <div class="stay-label">Relative's House</div>
+                <div class="stay-sub">Stay with family/friends</div>
+                <div class="stay-savings-note">🎉 Save on accommodation!</div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="processTrip()">✨ Generate AI Plan</button>
+        <p id="planError" class="error"></p>
+    </div>
+</div>
+
+<!-- PROCESSING PAGE -->
+<div id="processingPage" class="page">
+    <img class="proc-img" src="https://images.unsplash.com/photo-1488085061387-422e29b40080?w=600&q=80" alt="Planning">
+    <h2>Crafting Your Journey...</h2>
+    <p id="procStatus">Sending your details to Groq AI</p>
+    <p class="ai-status" id="aiStatusText">⚡ AI is thinking...</p>
+    <div class="loader"></div>
+</div>
+
+<!-- TRANSPORT SELECTION PAGE -->
+<div id="transportSelectPage" class="page">
+    <div class="ts-page-wrap">
+        <button class="ts-page-back" onclick="showPage('planPage')">← Back to Plan</button>
+        <div class="ts-page-title">Choose Transport</div>
+        <div class="ts-page-meta" id="tsPageMeta"></div>
+        <div class="ts-page-sub">Select how you want to travel — cost will be deducted from your budget</div>
+
+        <div id="tsNoFlight" class="ts-no-flight" style="display:none;">✈ No direct flights for this route. Choose train or bus below.</div>
+
+        <!-- Picked bar -->
+        <div class="ts-picked-bar" id="tsPickedBar">
+            <span class="ts-picked-bar-text" id="tsPickedText"></span>
+            <span class="ts-picked-bar-clear" onclick="clearTsPick()">✕ Change</span>
+        </div>
+
+        <!-- Cards injected here -->
+        <div id="tsCardsContainer"><div class="ts-loading"><div class="mini-loader"></div> Finding transport options...</div></div>
+
+        <!-- Local transport -->
+        <div id="tsLocalWrap" style="display:none;">
+            <div class="ts-section-label">🛺 Local Transport <div class="ts-section-line"></div></div>
+            <div class="ts-local-box" id="tsLocalBox"></div>
+        </div>
+
+        <button class="ts-proceed-btn" id="tsProceedBtn" onclick="proceedWithTransport()">✨ Proceed with this transport →</button>
+    </div>
+</div>
+
+<!-- BUDGET WARNING PAGE -->
+<div id="budgetWarnPage" class="page budget-warn-page">
+    <div class="budget-warn-card">
+        <div class="budget-warn-icon">⚠️</div>
+        <div class="budget-warn-title">Budget Not Sufficient</div>
+        <div class="budget-warn-msg" id="bwMsg"></div>
+        <div class="budget-warn-breakdown" id="bwBreakdown"></div>
+        <div class="budget-warn-actions">
+            <button class="btn-warn-back" onclick="showPage('transportSelectPage')">← Choose Cheaper Transport</button>
+            <button class="btn-warn-back" onclick="showPage('planPage')">✏️ Change Budget</button>
+            <button class="btn-warn-proceed" onclick="proceedAnyway()">Proceed Anyway →</button>
+        </div>
+    </div>
+</div>
+
+<!-- RESULT PAGE -->
+<div id="resultPage" class="page">
+    <div class="result-banner">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80" alt="Travel">
+        <div class="result-banner-overlay">✈ Your AI Trip Plan is Ready!</div>
+    </div>
+    <div class="result-card">
+        <h2>Your Travel Plan</h2>
+        <div class="result-row"><span class="label">From</span><span class="value" id="resSource"></span></div>
+        <div class="result-row"><span class="label">Destination</span><span class="value" id="resDestination"></span></div>
+        <div class="result-row"><span class="label">Duration</span><span class="value"><span id="resDays"></span> Days</span></div>
+        <div class="result-row"><span class="label">Persons</span><span class="value" id="resPersons"></span></div>
+        <div class="result-row"><span class="label">Budget</span><span class="value">₹<span id="resBudget"></span></span></div>
+        <div class="result-row"><span class="label">Style</span><span class="value" id="resStyle"></span></div>
+        <div class="result-row"><span class="label">Stay</span><span class="value" id="resStay"></span></div>
+    </div>
+
+    <!-- TRIP SUMMARY CARD -->
+    <div class="trip-summary-wrap">
+        <div class="trip-summary-card" id="tripSummaryCard">
+            <div class="trip-summary-header">
+                <span class="ts-icon">🗒️</span>
+                <h3>Trip Summary</h3>
+                <span class="ai-badge" style="margin:0 0 0 auto;padding:4px 10px;font-size:11px;"><span class="ai-dot"></span> AI Generated</span>
+            </div>
+            <div id="tripSummaryBody">
+                <div class="ts-loading"><div class="mini-loader"></div> Groq AI is building your trip summary...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-card" style="padding-top:0;background:transparent;border:none;box-shadow:none;padding:0;width:100%;max-width:700px;">
+        <div class="result-tabs" style="margin-top:0;">
+            <button class="result-tab-btn active" id="tab-itinerary" onclick="switchAiTab('itinerary')">
+                <span class="tab-icon">📅</span>Day Plan
+            </button>
+            <button class="result-tab-btn" id="tab-hotels" onclick="switchAiTab('hotels')">
+                <span class="tab-icon">🏨</span>Stay
+            </button>
+            <button class="result-tab-btn" id="tab-transport" onclick="switchAiTab('transport')">
+                <span class="tab-icon">🚗</span>Transport
+            </button>
+            <button class="result-tab-btn" id="tab-food" onclick="switchAiTab('food')">
+                <span class="tab-icon">🍽️</span>Food
+            </button>
+            <button class="result-tab-btn" id="tab-budget" onclick="switchAiTab('budget')">
+                <span class="tab-icon">💰</span>Budget
+            </button>
+        </div>
+        <div style="background:rgba(255,255,255,0.07);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:24px;margin-top:12px;">
+            <div class="result-section open" id="section-itinerary"><div class="tab-loading"><div class="mini-loader"></div> Generating itinerary...</div></div>
+            <div class="result-section" id="section-hotels"></div>
+            <div class="result-section" id="section-transport"></div>
+            <div class="result-section" id="section-food"></div>
+            <div class="result-section" id="section-budget"></div>
+        </div>
+    </div>
+    <button class="btn-back" onclick="goToDashboard()">← Back to Dashboard</button>
+</div>
+
+<script>
+// ============ API KEY — REPLACE WITH YOUR KEY ============
+var GROQ_API_KEY = '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';
+// =========================================================
+
+// ── Groq API helper with model fallback ─────────────────────────────────────
+var GROQ_MODELS = [
+    'llama-3.3-70b-versatile',
+    'llama-3.1-8b-instant',
+    'llama3-70b-8192',
+    'mixtral-8x7b-32768'
+];
+
+async function callGemini(promptText, jsonMode) {
+    var lastError = null;
+    for (var i = 0; i < GROQ_MODELS.length; i++) {
+        var model = GROQ_MODELS[i];
+        try {
+            var body = {
+                model: model,
+                messages: [{ role: 'user', content: promptText }],
+                temperature: jsonMode ? 0.1 : 0.7,
+                max_tokens: 2000
+            };
+            if (jsonMode) body.response_format = { type: 'json_object' };
+
+            var resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + GROQ_API_KEY
+                },
+                body: JSON.stringify(body)
+            });
+            var data = await resp.json();
+            if (!resp.ok) {
+                var msg = (data.error && data.error.message) || ('Groq API ' + resp.status);
+                // If model decommissioned or not found, try next
+                if (msg.includes('decommissioned') || msg.includes('not found') || msg.includes('deprecated')) {
+                    lastError = msg;
+                    continue;
+                }
+                throw new Error(msg);
+            }
+            var text = data.choices && data.choices[0] ? data.choices[0].message.content : '';
+            if (!text) throw new Error('Empty response from Groq');
+            return text;
+        } catch(e) {
+            if (e.message && (e.message.includes('decommissioned') || e.message.includes('deprecated') || e.message.includes('not found'))) {
+                lastError = e.message;
+                continue;
+            }
+            throw e;
+        }
+    }
+    throw new Error('All Groq models failed. Last error: ' + (lastError || 'Unknown'));
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ============ PLATFORM COMPARISON DATA ============
+// Multipliers vs our base prices for each platform
+const platformData = [
+    { name: "SmartTour (Ours)", color: "#00c4a7", hotelMult: 1.00, transportMult: 1.00, isOurs: true },
+    { name: "MakeMyTrip",       color: "#e63946", hotelMult: 1.18, transportMult: 1.12, isOurs: false },
+    { name: "Goibibo",          color: "#f4a261", hotelMult: 1.14, transportMult: 1.09, isOurs: false },
+    { name: "Yatra",            color: "#457b9d", hotelMult: 1.22, transportMult: 1.15, isOurs: false },
+    { name: "Cleartrip",        color: "#a8dadc", hotelMult: 1.10, transportMult: 1.08, isOurs: false },
+    { name: "EaseMyTrip",       color: "#9b5de5", hotelMult: 1.16, transportMult: 1.11, isOurs: false },
+];
+
+// ============ DESTINATION DATA ============
+const destinationData = {
+    agra: {
+        name: "Agra",
+        subtitle: "Home of the Taj Mahal — a timeless wonder",
+        image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=80",
+        places: [
+            { name: "Taj Mahal", type: "UNESCO Heritage", entry: 50, desc: "One of the Seven Wonders of the World" },
+            { name: "Agra Fort", type: "Historical", entry: 40, desc: "Massive Mughal-era fort with stunning views" },
+            { name: "Fatehpur Sikri", type: "Heritage Site", entry: 35, desc: "Abandoned Mughal capital city" },
+            { name: "Mehtab Bagh", type: "Garden", entry: 25, desc: "Perfect sunset view of Taj Mahal" },
+            { name: "Itimad-ud-Daulah", type: "Monument", entry: 20, desc: "Baby Taj — a marble masterpiece" },
+        ],
+        hotels: {
+            5000:  [{ name: "Hotel Sheela", price: 600, rating: "⭐⭐⭐", amenities: "Free WiFi · AC · Breakfast" }, { name: "Zostel Agra", price: 400, rating: "⭐⭐⭐", amenities: "Hostel · WiFi · Lockers" }],
+            10000: [{ name: "Hotel Amar", price: 1200, rating: "⭐⭐⭐", amenities: "Pool · WiFi · Restaurant" }, { name: "Treebo Taj View", price: 1500, rating: "⭐⭐⭐⭐", amenities: "AC · WiFi · Breakfast" }],
+            20000: [{ name: "Coral Court Hotel", price: 2500, rating: "⭐⭐⭐⭐", amenities: "Spa · Pool · Restaurant" }, { name: "Hotel Clarks Shiraz", price: 3500, rating: "⭐⭐⭐⭐", amenities: "Rooftop · Pool · WiFi" }],
+            50000: [{ name: "The Oberoi Amarvilas", price: 18000, rating: "⭐⭐⭐⭐⭐", amenities: "Taj View · Spa · Fine Dining" }, { name: "ITC Mughal Resort", price: 12000, rating: "⭐⭐⭐⭐⭐", amenities: "Heritage · Pool · Spa" }],
+        },
+        transport: {
+            5000:  [{ mode: "🚌", name: "State Bus", route: "Delhi → Agra", price: 250, duration: "4-5 hrs" }, { mode: "🚆", name: "Express Train", route: "Mathura → Agra", price: 150, duration: "1 hr" }],
+            10000: [{ mode: "🚆", name: "Gatimaan Express", route: "Delhi → Agra", price: 750, duration: "1.5 hrs" }, { mode: "🚌", name: "AC Volvo Bus", route: "Delhi → Agra", price: 600, duration: "3.5 hrs" }],
+            20000: [{ mode: "🚆", name: "Shatabdi Express", route: "Delhi → Agra", price: 1200, duration: "2 hrs" }, { mode: "🚗", name: "Cab (One Way)", route: "Delhi → Agra", price: 2500, duration: "3 hrs" }],
+            50000: [{ mode: "✈️", name: "Flight + Cab", route: "Any City → Agra", price: 5000, duration: "2-4 hrs" }, { mode: "🚗", name: "Luxury Cab", route: "Delhi → Agra", price: 4500, duration: "3 hrs" }],
+        }
+    },
+    mumbai: {
+        name: "Mumbai",
+        subtitle: "The city that never sleeps — India's financial capital",
+        image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=1200&q=80",
+        places: [
+            { name: "Gateway of India", type: "Landmark", entry: 0, desc: "Iconic arch monument on the seafront" },
+            { name: "Marine Drive", type: "Promenade", entry: 0, desc: "Queen's Necklace — beautiful coastal road" },
+            { name: "Elephanta Caves", type: "UNESCO Heritage", entry: 40, desc: "Ancient rock-cut cave temples" },
+            { name: "Juhu Beach", type: "Beach", entry: 0, desc: "Famous beach with street food" },
+            { name: "Chhatrapati Shivaji Museum", type: "Museum", entry: 85, desc: "Premier museum of art & history" },
+        ],
+        hotels: {
+            5000:  [{ name: "Hotel Decent", price: 800, rating: "⭐⭐⭐", amenities: "WiFi · AC · Central Location" }, { name: "Backpacker Panda", price: 500, rating: "⭐⭐⭐", amenities: "Hostel · WiFi · Lockers" }],
+            10000: [{ name: "Hotel Fariyas", price: 2000, rating: "⭐⭐⭐⭐", amenities: "Pool · WiFi · Restaurant" }, { name: "Ibis Mumbai Airport", price: 2500, rating: "⭐⭐⭐⭐", amenities: "AC · WiFi · Gym" }],
+            20000: [{ name: "The Lalit Mumbai", price: 5000, rating: "⭐⭐⭐⭐", amenities: "Spa · Pool · Restaurant" }, { name: "JW Marriott", price: 7000, rating: "⭐⭐⭐⭐⭐", amenities: "Sea View · Pool · Fine Dining" }],
+            50000: [{ name: "The Taj Mahal Palace", price: 20000, rating: "⭐⭐⭐⭐⭐", amenities: "Heritage · Sea View · Butler" }, { name: "Oberoi Mumbai", price: 18000, rating: "⭐⭐⭐⭐⭐", amenities: "Pool · Spa · Fine Dining" }],
+        },
+        transport: {
+            5000:  [{ mode: "🚆", name: "Local Train", route: "Within Mumbai", price: 20, duration: "Varies" }, { mode: "🚌", name: "BEST Bus", route: "City Bus", price: 15, duration: "Varies" }],
+            10000: [{ mode: "✈️", name: "Flight", route: "Delhi → Mumbai", price: 3500, duration: "2 hrs" }, { mode: "🚆", name: "Rajdhani Express", route: "Delhi → Mumbai", price: 1200, duration: "16 hrs" }],
+            20000: [{ mode: "✈️", name: "Flight (Direct)", route: "Any Metro → Mumbai", price: 4500, duration: "2-3 hrs" }, { mode: "🚗", name: "Cab Rental", route: "Airport → Hotel", price: 800, duration: "30-60 min" }],
+            50000: [{ mode: "✈️", name: "Business Class", route: "Any City → Mumbai", price: 12000, duration: "2-3 hrs" }, { mode: "🚗", name: "Luxury Cab", route: "Airport → Hotel", price: 2000, duration: "30-45 min" }],
+        }
+    },
+    goa: {
+        name: "Goa",
+        subtitle: "Sun, sand & serenity — India's beach paradise",
+        image: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=1200&q=80",
+        places: [
+            { name: "Baga Beach", type: "Beach", entry: 0, desc: "Most popular beach with water sports" },
+            { name: "Calangute Beach", type: "Beach", entry: 0, desc: "Queen of Beaches — vibrant & lively" },
+            { name: "Dudhsagar Falls", type: "Waterfall", entry: 400, desc: "One of India's tallest waterfalls" },
+            { name: "Old Goa Churches", type: "Heritage", entry: 0, desc: "UNESCO listed Portuguese-era churches" },
+            { name: "Anjuna Flea Market", type: "Market", entry: 0, desc: "Famous Wednesday flea market" },
+        ],
+        hotels: {
+            5000:  [{ name: "Goa Backpackers", price: 500, rating: "⭐⭐⭐", amenities: "Hostel · WiFi · Beach Nearby" }, { name: "Villa Sol Beach Resort", price: 900, rating: "⭐⭐⭐", amenities: "AC · WiFi · Garden" }],
+            10000: [{ name: "Airlie Beach Hotel", price: 2000, rating: "⭐⭐⭐⭐", amenities: "Pool · WiFi · Restaurant" }, { name: "Hotel Baga Breeze", price: 1800, rating: "⭐⭐⭐⭐", amenities: "AC · WiFi · Beachside" }],
+            20000: [{ name: "Novotel Goa Resort", price: 5500, rating: "⭐⭐⭐⭐", amenities: "Pool · Spa · Beach Access" }, { name: "Alila Diwa Goa", price: 6000, rating: "⭐⭐⭐⭐⭐", amenities: "Infinity Pool · Spa · Dining" }],
+            50000: [{ name: "The Leela Goa", price: 15000, rating: "⭐⭐⭐⭐⭐", amenities: "Private Beach · Spa · Butler" }, { name: "Taj Exotica Goa", price: 18000, rating: "⭐⭐⭐⭐⭐", amenities: "Beach Villa · Pool · Fine Dining" }],
+        },
+        transport: {
+            5000:  [{ mode: "🛵", name: "Scooter Rental", route: "Within Goa", price: 300, duration: "Per Day" }, { mode: "🚌", name: "Local Bus", route: "Panaji ↔ Beaches", price: 30, duration: "Varies" }],
+            10000: [{ mode: "✈️", name: "Flight", route: "Mumbai → Goa", price: 2500, duration: "1 hr" }, { mode: "🚆", name: "Konkan Railway", route: "Mumbai → Goa", price: 800, duration: "8-10 hrs" }],
+            20000: [{ mode: "✈️", name: "Flight (Direct)", route: "Delhi → Goa", price: 5000, duration: "2.5 hrs" }, { mode: "🚗", name: "Cab Rental", route: "Full Day Sightseeing", price: 2500, duration: "8 hrs" }],
+            50000: [{ mode: "✈️", name: "Business Class", route: "Any City → Goa", price: 14000, duration: "1-3 hrs" }, { mode: "🚗", name: "Luxury Cab", route: "Airport Transfers", price: 2000, duration: "30 min" }],
+        }
+    },
+    kerala: {
+        name: "Kerala",
+        subtitle: "God's Own Country — backwaters, hills & culture",
+        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80",
+        places: [
+            { name: "Alleppey Backwaters", type: "Nature", entry: 0, desc: "Iconic houseboat rides through canals" },
+            { name: "Munnar Hills", type: "Hill Station", entry: 0, desc: "Tea plantations & misty mountains" },
+            { name: "Periyar Wildlife Sanctuary", type: "Wildlife", entry: 150, desc: "Tigers, elephants & boat safari" },
+            { name: "Kovalam Beach", type: "Beach", entry: 0, desc: "Crescent-shaped beach with lighthouse" },
+            { name: "Athirapally Falls", type: "Waterfall", entry: 30, desc: "Niagara of India — stunning cascade" },
+        ],
+        hotels: {
+            5000:  [{ name: "Kerala Homestay", price: 700, rating: "⭐⭐⭐", amenities: "Homemade Food · WiFi · AC" }, { name: "Zostel Kochi", price: 500, rating: "⭐⭐⭐", amenities: "Hostel · WiFi · Social" }],
+            10000: [{ name: "Lake Palace Resort", price: 2200, rating: "⭐⭐⭐⭐", amenities: "Lake View · WiFi · Restaurant" }, { name: "Spice Village Thekkady", price: 2500, rating: "⭐⭐⭐⭐", amenities: "Eco Resort · Pool · Nature" }],
+            20000: [{ name: "Kumarakom Lake Resort", price: 6000, rating: "⭐⭐⭐⭐⭐", amenities: "Villa · Pool · Ayurveda" }, { name: "The Zuri Kumarakom", price: 5500, rating: "⭐⭐⭐⭐", amenities: "Lake View · Spa · Pool" }],
+            50000: [{ name: "Niraamaya Retreats", price: 14000, rating: "⭐⭐⭐⭐⭐", amenities: "Private Villa · Ayurveda · Pool" }, { name: "CGH Earth Hotels", price: 12000, rating: "⭐⭐⭐⭐⭐", amenities: "Heritage · Eco · Spa" }],
+        },
+        transport: {
+            5000:  [{ mode: "🚌", name: "KSRTC Bus", route: "Kochi → Munnar", price: 200, duration: "4 hrs" }, { mode: "🚆", name: "Train", route: "Chennai → Kochi", price: 400, duration: "6-7 hrs" }],
+            10000: [{ mode: "✈️", name: "Flight", route: "Delhi → Kochi", price: 4000, duration: "2.5 hrs" }, { mode: "🚗", name: "Cab", route: "Kochi → Alleppey", price: 1200, duration: "1.5 hrs" }],
+            20000: [{ mode: "✈️", name: "Flight (Direct)", route: "Any Metro → Kochi", price: 5000, duration: "2-3 hrs" }, { mode: "⛵", name: "Houseboat", route: "Alleppey Backwaters", price: 5000, duration: "Full Day" }],
+            50000: [{ mode: "✈️", name: "Business Class", route: "Any City → Kochi", price: 15000, duration: "2-3 hrs" }, { mode: "⛵", name: "Luxury Houseboat", route: "Premium Backwater Tour", price: 12000, duration: "Overnight" }],
+        }
+    },
+    jaipur: {
+        name: "Jaipur",
+        subtitle: "The Pink City — royal palaces & vibrant bazaars",
+        image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=1200&q=80",
+        places: [
+            { name: "Amber Fort", type: "Heritage", entry: 100, desc: "Majestic hilltop fort with stunning interiors" },
+            { name: "Hawa Mahal", type: "Landmark", entry: 50, desc: "Palace of Winds — iconic 5-storey façade" },
+            { name: "City Palace", type: "Royal Palace", entry: 200, desc: "Residence of the royal family of Jaipur" },
+            { name: "Jantar Mantar", type: "UNESCO Site", entry: 50, desc: "Ancient astronomical observatory" },
+            { name: "Nahargarh Fort", type: "Fort", entry: 50, desc: "Best sunset view point of Jaipur" },
+        ],
+        hotels: {
+            5000:  [{ name: "Hotel Pearl Palace", price: 700, rating: "⭐⭐⭐", amenities: "Rooftop · WiFi · AC" }, { name: "Zostel Jaipur", price: 450, rating: "⭐⭐⭐", amenities: "Hostel · WiFi · Central" }],
+            10000: [{ name: "Hotel Diggi Palace", price: 1800, rating: "⭐⭐⭐⭐", amenities: "Heritage · Garden · WiFi" }, { name: "Alsisar Haveli", price: 2200, rating: "⭐⭐⭐⭐", amenities: "Heritage · Pool · Restaurant" }],
+            20000: [{ name: "Samode Haveli", price: 5000, rating: "⭐⭐⭐⭐⭐", amenities: "Rooftop Pool · Heritage · Spa" }, { name: "Jai Mahal Palace", price: 6000, rating: "⭐⭐⭐⭐⭐", amenities: "Pool · Gardens · Fine Dining" }],
+            50000: [{ name: "Rambagh Palace", price: 22000, rating: "⭐⭐⭐⭐⭐", amenities: "Royal Suite · Spa · Pool" }, { name: "Taj Jai Mahal Palace", price: 18000, rating: "⭐⭐⭐⭐⭐", amenities: "Heritage · Butler · Pool" }],
+        },
+        transport: {
+            5000:  [{ mode: "🚌", name: "Volvo Bus", route: "Delhi → Jaipur", price: 400, duration: "5 hrs" }, { mode: "🚆", name: "Express Train", route: "Delhi → Jaipur", price: 300, duration: "4.5 hrs" }],
+            10000: [{ mode: "🚆", name: "Shatabdi Express", route: "Delhi → Jaipur", price: 850, duration: "4 hrs" }, { mode: "🚗", name: "Cab (Shared)", route: "Delhi → Jaipur", price: 1200, duration: "4.5 hrs" }],
+            20000: [{ mode: "✈️", name: "Flight", route: "Mumbai → Jaipur", price: 4000, duration: "1.5 hrs" }, { mode: "🚗", name: "Private Cab", route: "Delhi → Jaipur", price: 3000, duration: "4.5 hrs" }],
+            50000: [{ mode: "✈️", name: "Business Class", route: "Any City → Jaipur", price: 12000, duration: "1-3 hrs" }, { mode: "🐘", name: "Heritage Tour", route: "Amber Fort Elephant Ride", price: 1100, duration: "30 min" }],
+        }
+    }
+};
+
+let currentDest = null;
+let currentBudget = null;
+let currentPersons = 1;
+
+// ============ FUNCTIONS ============
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+    const flexPages = ["loginPage", "planPage", "processingPage", "resultPage"];
+    document.getElementById(pageId).style.display = flexPages.includes(pageId) ? "flex" : "block";
+}
+
+function validateLogin() {
+    let email = document.getElementById("email").value.trim();
+    let password = document.getElementById("password").value;
+    let errorMsg = document.getElementById("errorMsg");
+    if (!email) { errorMsg.innerText = "Please enter your email."; return; }
+    if (!email.endsWith("@gmail.com")) { errorMsg.innerText = "Please enter valid email address."; return; }
+    if (!password) { errorMsg.innerText = "Please enter your password."; return; }
+    errorMsg.innerText = "";
+    showPage("dashboardPage");
+}
+
+function openDestination(destKey) {
+    currentDest = destKey;
+    currentBudget = null;
+    const data = destinationData[destKey];
+    document.getElementById("detailTitle").innerText = data.name;
+    document.getElementById("detailSubtitle").innerText = data.subtitle;
+    document.getElementById("detailHero").style.backgroundImage = `url('${data.image}')`;
+    document.getElementById("placesContainer").innerHTML = '';
+    document.getElementById("hotelsContainer").innerHTML = '';
+    document.getElementById("transportContainer").innerHTML = '';
+    document.querySelectorAll(".budget-btn").forEach(b => b.classList.remove("active"));
+    currentPersons = 1;
+    document.getElementById("personCount").innerText = "1";
+    document.getElementById("totalCostBar").style.display = "none";
+    document.getElementById("compareSection").style.display = "none";
+    document.getElementById("customBudget").value = "";
+    document.querySelectorAll(".budget-btn").forEach(b => b.classList.remove("active"));
+    showPage("destDetailPage");
+    renderPlaces(data.places);
+}
+
+function renderPlaces(places) {
+    const container = document.getElementById("placesContainer");
+    container.innerHTML = places.map(p => `
+        <div class="info-card">
+            <div class="card-name">${p.name}</div>
+            <div class="card-detail">${p.desc}</div>
+            <div class="card-badge">${p.type}</div>
+            <div class="card-price">${p.entry === 0 ? '✅ Free Entry' : '🎟 Entry: ₹' + p.entry}</div>
+        </div>
+    `).join('');
+}
+
+function changePerson(delta) {
+    currentPersons = Math.max(1, Math.min(20, currentPersons + delta));
+    document.getElementById("personCount").innerText = currentPersons;
+    document.getElementById("personCount").nextElementSibling.innerText = currentPersons === 1 ? "person" : "persons";
+    if (currentBudget) updateTotalCost();
+}
+
+function updateTotalCost() {
+    const data = destinationData[currentDest];
+    const hotels = data.hotels[currentBudget];
+    const transport = data.transport[currentBudget];
+    const places = data.places;
+
+    // Hotel: 1 room fits 2 persons, so ceil(persons/2) rooms needed
+    const hotelPerRoom = hotels && hotels.length > 0 ? hotels[0].price : 0;
+    const roomsNeeded = Math.ceil(currentPersons / 2);
+    const hotelTotal = hotelPerRoom * roomsNeeded;
+
+    // Transport: each person needs a ticket/seat
+    const transportPerPerson = transport && transport.length > 0 ? transport[0].price : 0;
+    const transportTotal = transportPerPerson * currentPersons;
+
+    // Entry: each person pays separately
+    const entryPerPerson = places.reduce((sum, p) => sum + p.entry, 0);
+    const entryTotal = entryPerPerson * currentPersons;
+
+    const grandTotal = hotelTotal + transportTotal + entryTotal;
+
+    // Build breakdown note
+    let notes = [];
+    if (hotelTotal > 0) notes.push(`🏨 ${roomsNeeded} room${roomsNeeded > 1 ? 's' : ''} × ₹${hotelPerRoom.toLocaleString()} = ₹${hotelTotal.toLocaleString()}`);
+    if (transportTotal > 0) notes.push(`🚗 ${currentPersons} ticket${currentPersons > 1 ? 's' : ''} × ₹${transportPerPerson.toLocaleString()} = ₹${transportTotal.toLocaleString()}`);
+    if (entryTotal > 0) notes.push(`🎟 Entry × ${currentPersons} = ₹${entryTotal.toLocaleString()}`);
+
+    document.getElementById("totalCostBar").style.display = "flex";
+    document.getElementById("totalCostValue").innerText = "₹" + grandTotal.toLocaleString();
+    document.getElementById("totalCostNote").innerText = notes.join("   |   ");
+}
+
+function setPresetBudget(amount) {
+    document.getElementById("customBudget").value = amount;
+    document.querySelectorAll(".budget-btn").forEach(b => {
+        b.classList.toggle("active", parseInt(b.innerText.replace(/[₹,]/g, '')) === amount);
+    });
+    runComparison();
+}
+
+function runComparison() {
+    const inputVal = parseInt(document.getElementById("customBudget").value);
+    if (!inputVal || inputVal < 1000) {
+        alert("Please enter a valid budget (minimum ₹1,000)");
+        return;
+    }
+
+    // Find closest preset bracket
+    const brackets = [5000, 10000, 20000, 50000];
+    const bracket = brackets.reduce((prev, curr) =>
+        Math.abs(curr - inputVal) < Math.abs(prev - inputVal) ? curr : prev
+    );
+
+    currentBudget = bracket;
+    const data = destinationData[currentDest];
+    renderHotels(data.hotels[bracket]);
+    renderTransport(data.transport[bracket]);
+    updateTotalCost();
+    renderComparison(inputVal, data, bracket);
+}
+
+function renderComparison(userBudget, data, bracket) {
+    const hotels = data.hotels[bracket];
+    const transport = data.transport[bracket];
+
+    const baseHotel = hotels && hotels.length > 0 ? hotels[0].price : 0;
+    const baseTransport = transport && transport.length > 0 ? transport[0].price : 0;
+    const roomsNeeded = Math.ceil(currentPersons / 2);
+    const baseTotal = (baseHotel * roomsNeeded) + (baseTransport * currentPersons);
+
+    const rows = platformData.map(p => {
+        const pHotel = Math.round(baseHotel * p.hotelMult);
+        const pTransport = Math.round(baseTransport * p.transportMult);
+        const pTotal = (pHotel * roomsNeeded) + (pTransport * currentPersons);
+        return { ...p, pHotel, pTransport, pTotal };
+    }).sort((a, b) => a.pTotal - b.pTotal);
+
+    const minTotal = rows[0].pTotal;
+    const maxTotal = rows[rows.length - 1].pTotal;
+
+    const tbody = document.getElementById("compareBody");
+    tbody.innerHTML = rows.map(r => {
+        const isBest = r.pTotal === minTotal;
+        const isWorst = r.pTotal === maxTotal && !r.isOurs;
+        const verdict = isBest
+            ? `<span class="badge-best">✅ BEST DEAL</span>`
+            : isWorst
+            ? `<span class="badge-high">⚠ Expensive</span>`
+            : `<span style="color:#7ab8d4; font-size:12px;">Average</span>`;
+
+        const withinBudget = r.pTotal <= userBudget
+            ? `<span style="color:#00c4a7; font-size:11px;">✔ Within Budget</span>`
+            : `<span style="color:#ff6b6b; font-size:11px;">✘ Over Budget by ₹${(r.pTotal - userBudget).toLocaleString()}</span>`;
+
+        return `<tr class="${r.isOurs ? 'our-row' : ''}">
+            <td>
+                <div class="platform-logo">
+                    <div class="platform-dot" style="background:${r.color}"></div>
+                    <div>
+                        <div class="platform-name" style="color:${r.isOurs ? '#00c4a7' : '#fff'}">${r.name}</div>
+                        <div>${withinBudget}</div>
+                    </div>
+                </div>
+            </td>
+            <td style="color:#a8d8ea;">₹${r.pHotel.toLocaleString()}/night</td>
+            <td style="color:#a8d8ea;">₹${r.pTransport.toLocaleString()}/person</td>
+            <td class="price-cell" style="color:${r.isOurs ? '#00c4a7' : '#fff'}">₹${r.pTotal.toLocaleString()}</td>
+            <td>${verdict}</td>
+        </tr>`;
+    }).join('');
+
+    // Savings bar
+    const ourTotal = rows.find(r => r.isOurs).pTotal;
+    const mostExpensive = maxTotal;
+    const savings = mostExpensive - ourTotal;
+    const savingsPct = Math.round((savings / mostExpensive) * 100);
+
+    document.getElementById("savingsText").innerText =
+        `You save ₹${savings.toLocaleString()} (${savingsPct}%) by booking with SmartTour vs the most expensive platform!`;
+    document.getElementById("savingsSub").innerText =
+        `Based on ${currentPersons} traveller${currentPersons > 1 ? 's' : ''}, ${roomsNeeded} room${roomsNeeded > 1 ? 's' : ''}, budget ₹${userBudget.toLocaleString()}`;
+
+    document.getElementById("compareSection").style.display = "block";
+    document.getElementById("compareSection").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderHotels(hotels) {
+    const container = document.getElementById("hotelsContainer");
+    if (!hotels || hotels.length === 0) {
+        container.innerHTML = '<div class="no-data">No hotels available for this budget.</div>';
+        return;
+    }
+    container.innerHTML = hotels.map(h => `
+        <div class="info-card">
+            <div class="card-name">${h.name}</div>
+            <div class="card-detail">${h.rating}</div>
+            <div class="card-detail">🛎 ${h.amenities}</div>
+            <div class="card-price">₹${h.price.toLocaleString()} / night</div>
+        </div>
+    `).join('');
+}
+
+function renderTransport(options) {
+    const container = document.getElementById("transportContainer");
+    if (!options || options.length === 0) {
+        container.innerHTML = '<div class="no-data">No transport options available.</div>';
+        return;
+    }
+    container.innerHTML = options.map(t => `
+        <div class="transport-card">
+            <div class="transport-icon">${t.mode}</div>
+            <div class="transport-info">
+                <div class="t-name">${t.name}</div>
+                <div class="t-detail">📍 ${t.route}</div>
+                <div class="t-detail">⏱ ${t.duration}</div>
+                <div class="t-price">₹${t.price.toLocaleString()}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function goToPlan() { showPage("planPage"); }
+function goToDashboard() { showPage("dashboardPage"); }
+
+// ============ RESULT PAGE TABS ============
+function openResultTab(tab) {
+    // Toggle active tab button
+    ['hotels','attractions','transport'].forEach(function(t) {
+        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+        var sec = document.getElementById('section-' + t);
+        sec.classList.toggle('open', t === tab);
+    });
+
+    // Render content if empty
+    var section = document.getElementById('section-' + tab);
+    if (section.innerHTML.trim() !== '') return; // already rendered
+
+    var dest      = (document.getElementById('resDestination').innerText || '').toLowerCase();
+    var budgetRaw = (document.getElementById('resBudget').innerText || '').replace(/,/g,'');
+    var budget    = parseInt(budgetRaw) || 10000;
+
+    // Find closest budget bracket
+    var brackets  = [5000, 10000, 20000, 50000];
+    var bracket   = brackets.reduce(function(p, c) {
+        return Math.abs(c - budget) < Math.abs(p - budget) ? c : p;
+    });
+
+    var data = destinationData[dest];
+
+    if (tab === 'hotels') {
+        if (!data || !data.hotels || !data.hotels[bracket]) {
+            section.innerHTML = '<div class="no-data-msg">No hotel data available for this destination.<br>Try searching on MakeMyTrip or Goibibo.</div>';
+            return;
+        }
+        section.innerHTML = data.hotels[bracket].map(function(h) {
+            return '<div class="res-card">'
+                + '<div class="res-card-name">🏨 ' + h.name + '</div>'
+                + '<div class="res-card-detail">' + h.rating + ' &nbsp;·&nbsp; ' + h.amenities + '</div>'
+                + '<div class="res-card-price">₹' + h.price.toLocaleString() + ' / night</div>'
+                + '</div>';
+        }).join('');
+    }
+
+    if (tab === 'attractions') {
+        if (!data || !data.places) {
+            section.innerHTML = '<div class="no-data-msg">No attraction data available for this destination.</div>';
+            return;
+        }
+        section.innerHTML = data.places.map(function(p) {
+            return '<div class="res-card">'
+                + '<div class="res-card-name">📍 ' + p.name + '</div>'
+                + '<div class="res-card-detail">' + p.desc + '</div>'
+                + '<span class="res-card-badge">' + p.type + '</span>'
+                + '<div class="res-card-price">' + (p.entry === 0 ? '✅ Free Entry' : '🎟 Entry: ₹' + p.entry) + '</div>'
+                + '</div>';
+        }).join('');
+    }
+
+    if (tab === 'transport') {
+        if (!data || !data.transport || !data.transport[bracket]) {
+            section.innerHTML = '<div class="no-data-msg">No transport data available for this destination.</div>';
+            return;
+        }
+        section.innerHTML = data.transport[bracket].map(function(t) {
+            return '<div class="res-transport-card">'
+                + '<div class="res-t-icon">' + t.mode + '</div>'
+                + '<div>'
+                + '<div class="res-t-name">' + t.name + '</div>'
+                + '<div class="res-t-detail">📍 ' + t.route + '</div>'
+                + '<div class="res-t-duration">⏱ ' + t.duration + '</div>'
+                + '</div>'
+                + '<div class="res-t-price">₹' + t.price.toLocaleString() + '<div class="res-t-duration">per person</div></div>'
+                + '</div>';
+        }).join('');
+    }
+}
+
+// Plan page helpers
+var planPersons = 1;
+var planStay    = 'hotel';
+var aiTripData  = {};
+
+function selectStay(type) {
+    planStay = type;
+    document.getElementById('stayHotel').classList.toggle('selected', type === 'hotel');
+    document.getElementById('stayRelative').classList.toggle('selected', type === 'relative');
+}
+
+function changePlanPersons(delta) {
+    planPersons = Math.max(1, Math.min(20, planPersons + delta));
+    document.getElementById("planPersonsCount").innerText = planPersons;
+    document.getElementById("planPersonsLabel").innerText = planPersons === 1 ? "person" : "persons";
+    updatePerPersonHint();
+}
+
+function updatePerPersonHint() {
+    var b = parseInt(document.getElementById("budget").value);
+    var hint = document.getElementById("perPersonHint");
+    hint.innerText = (b && b > 0)
+        ? "Budget per person: ₹" + Math.round(b / planPersons).toLocaleString()
+        : "Budget per person: —";
+}
+
+// AI status cycling
+var _statusMessages = [
+    "⚡ AI is thinking...", "🗺️ Mapping out your route...",
+    "🏨 Finding best stays...", "🚗 Checking transport options...",
+    "🍽️ Curating local food spots...", "💰 Calculating budget breakdown...",
+    "📅 Building day-by-day itinerary...", "✨ Almost ready..."
+];
+var _statusIdx = 0, _statusInt = null;
+function startStatusCycle() {
+    _statusIdx = 0;
+    document.getElementById('aiStatusText').innerText = _statusMessages[0];
+    _statusInt = setInterval(function() {
+        _statusIdx = (_statusIdx + 1) % _statusMessages.length;
+        document.getElementById('aiStatusText').innerText = _statusMessages[_statusIdx];
+    }, 2000);
+}
+function stopStatusCycle() { if (_statusInt) clearInterval(_statusInt); }
+
+var _tsOptions   = null;   // full transport JSON from AI
+var _tsPicked    = null;   // { id, name, price (total both ways) }
+var _tripFormData = {};    // saved form values
+
+async function processTrip() {
+    var source = document.getElementById("sourceCity").value.trim();
+    var dest   = document.getElementById("destination").value.trim();
+    var days   = document.getElementById("days").value;
+    var budget = document.getElementById("budget").value;
+    var style  = document.getElementById("travelStyle").value;
+    var err    = document.getElementById("planError");
+
+    if (!source) { err.innerText = "Please enter your source city."; return; }
+    if (!dest)   { err.innerText = "Please enter your destination."; return; }
+    if (!days)   { err.innerText = "Please enter number of days."; return; }
+    if (!budget) { err.innerText = "Please enter your budget."; return; }
+    err.innerText = "";
+
+    _tripFormData = { source, dest, days, budget: parseInt(budget), style, persons: planPersons, stay: planStay };
+    _tsPicked = null;
+
+    // Step 1: Show loading, fetch transport options
+    showPage("processingPage");
+    document.getElementById("procStatus").innerText   = "Finding transport options for your route...";
+    document.getElementById("aiStatusText").innerText = "🚆 Checking trains, buses & flights...";
+
+    try {
+        var text = await callGemini(buildTransportPrompt(source, dest, planPersons, parseInt(budget)), true);
+        var raw  = text.replace(/```json|```/g,'').trim();
+        var jm   = raw.match(/\{[\s\S]*\}/);
+        var tr   = JSON.parse(jm ? jm[0] : raw);
+        tr.trains  = tr.trains  || [];
+        tr.buses   = tr.buses   || [];
+        tr.flights = tr.flights || [];
+        tr.local   = tr.local   || '';
+        _tsOptions = tr;
+        renderTransportSelectPage(tr);
+        showPage("transportSelectPage");
+    } catch(e) {
+        showPage("planPage");
+        document.getElementById("planError").innerText = "⚠️ Error: " + e.message + ". Check your Groq API key in index.html";
+    }
+}
+
+function buildTransportPrompt(source, dest, persons, budget) {
+    return 'You are an Indian transport expert. Return ONLY raw JSON with no markdown, no backticks, no explanation.'
+         + ' For travel from ' + source + ' to ' + dest + ' for ' + persons + ' person(s) with total budget ₹' + budget.toLocaleString() + ','
+         + ' return this exact structure:\n'
+         + '{"trains":[{"name":"Train Name & Number","subname":"Class (e.g. AC 2 Tier)","duration":"5h 30m","price":350,"tag":"Budget Pick"}],'
+         + '"buses":[{"name":"Operator Name","subname":"Bus Type (e.g. AC Volvo)","duration":"6h 0m","price":450,"tag":"Comfortable"}],'
+         + '"flights":[{"name":"Airline Name","subname":"Economy","duration":"1h 10m","price":4500,"tag":"Fastest"}],'
+         + '"local":"Short 2-sentence paragraph about autos, cabs, metro inside ' + dest + ' with costs."}\n'
+         + 'Rules: price is per person ONE WAY in ₹. Give 2-3 options per mode. If flights not practical for this route distance, return empty array []. Use realistic Indian prices.';
+}
+
+function renderTransportSelectPage(tr) {
+    var persons = _tripFormData.persons;
+    var budget  = _tripFormData.budget;
+    var src     = _tripFormData.source.toUpperCase();
+    var dst     = _tripFormData.dest.toUpperCase();
+
+    document.getElementById('tsPageMeta').innerText = src + ' → ' + dst + ' · ' + persons + ' PERSON' + (persons > 1 ? 'S' : '') + ' · ₹' + budget.toLocaleString() + ' BUDGET';
+
+    var hasFlights = tr.flights && tr.flights.length > 0;
+    document.getElementById('tsNoFlight').style.display = hasFlights ? 'none' : 'block';
+
+    var html = '';
+
+    function makeCard(id, icon, name, subname, duration, price, tag) {
+        var total   = price * persons * 2;
+        var pct     = Math.round((total / budget) * 100);
+        var tagCls  = tag === 'Budget Pick' ? 'budget' : tag === 'Fastest' ? 'fast' : 'comfort';
+        var tagIcon = tag === 'Budget Pick' ? '💰' : tag === 'Fastest' ? '⚡' : '😊';
+        var safeId  = id.replace(/-/g,'_');
+        var safeName= name.replace(/'/g,"\\'");
+        return '<div class="ts-tr-card" id="tsCard-' + safeId + '" onclick="pickTransport(\'' + safeId + '\',\'' + safeName + '\',' + price + ',' + total + ')">'
+             + '<div class="ts-tr-inner">'
+             +   '<div class="ts-tr-top">'
+             +     '<div class="ts-tr-icon">' + icon + '</div>'
+             +     '<div class="ts-tr-mid">'
+             +       '<div class="ts-tr-name">' + esc(name) + '</div>'
+             +       '<div class="ts-tr-sub">' + esc(subname) + '</div>'
+             +     '</div>'
+             +     '<div class="ts-tr-price-col">'
+             +       '<div class="ts-tr-price">₹' + price.toLocaleString() + '</div>'
+             +       '<div class="ts-tr-price-label">per person, 1 way</div>'
+             +     '</div>'
+             +   '</div>'
+             +   '<div class="ts-tr-chips">'
+             +     '<span class="ts-chip ' + tagCls + '">' + tagIcon + ' ' + esc(tag) + '</span>'
+             +     '<span class="ts-chip dur">🕐 ' + esc(duration) + '</span>'
+             +     '<span class="ts-chip pct">' + pct + '% of budget (both ways)</span>'
+             +   '</div>'
+             + '</div>'
+             + '<div class="ts-tr-footer">'
+             +   '<span class="ts-tr-footer-label">Total both ways (' + persons + ' person' + (persons > 1 ? 's' : '') + '):</span>'
+             +   '<span class="ts-tr-footer-val">₹' + total.toLocaleString() + '</span>'
+             + '</div>'
+             + '</div>';
+    }
+
+    if (tr.trains && tr.trains.length) {
+        html += '<div class="ts-section-label">🚆 Trains <div class="ts-section-line"></div></div>';
+        tr.trains.forEach(function(t, i) {
+            html += makeCard('train-' + i, '🚆', t.name, t.subname, t.duration, t.price, t.tag || 'Comfortable');
+        });
+    }
+    if (tr.buses && tr.buses.length) {
+        html += '<div class="ts-section-label">🚌 Buses <div class="ts-section-line"></div></div>';
+        tr.buses.forEach(function(b, i) {
+            html += makeCard('bus-' + i, '🚌', b.name, b.subname, b.duration, b.price, b.tag || 'Comfortable');
+        });
+    }
+    if (hasFlights) {
+        html += '<div class="ts-section-label">✈️ Flights <div class="ts-section-line"></div></div>';
+        tr.flights.forEach(function(f, i) {
+            html += makeCard('flight-' + i, '✈️', f.name, f.subname, f.duration, f.price, f.tag || 'Fastest');
+        });
+    }
+
+    document.getElementById('tsCardsContainer').innerHTML = html;
+
+    if (tr.local) {
+        document.getElementById('tsLocalWrap').style.display = 'block';
+        document.getElementById('tsLocalBox').innerText = tr.local;
+    }
+}
+
+function pickTransport(safeId, name, pricePerPersonOneWay, totalBothWays) {
+    // Deselect all
+    document.querySelectorAll('.ts-tr-card').forEach(function(c) { c.classList.remove('picked'); });
+    document.getElementById('tsCard-' + safeId).classList.add('picked');
+    _tsPicked = { id: safeId, name: name, price: totalBothWays };
+
+    var bar = document.getElementById('tsPickedBar');
+    bar.classList.add('show');
+    document.getElementById('tsPickedText').innerText =
+        '✅ ' + name + ' — ₹' + totalBothWays.toLocaleString() + ' both ways for ' + _tripFormData.persons + ' person(s)';
+
+    document.getElementById('tsProceedBtn').classList.add('show');
+}
+
+function clearTsPick() {
+    document.querySelectorAll('.ts-tr-card').forEach(function(c) { c.classList.remove('picked'); });
+    _tsPicked = null;
+    document.getElementById('tsPickedBar').classList.remove('show');
+    document.getElementById('tsProceedBtn').classList.remove('show');
+}
+
+function proceedWithTransport() {
+    if (!_tsPicked) return;
+    var budget       = _tripFormData.budget;
+    var transportCost= _tsPicked.price;
+    var remaining    = budget - transportCost;
+    var persons      = _tripFormData.persons;
+    var days         = _tripFormData.days;
+
+    // Minimum needed: ~₹500/person/day for food + ₹800/person/night hotel (budget)
+    var stayFactor   = _tripFormData.stay === 'relative' ? 0 : 800 * Math.ceil(persons / 2) * days;
+    var foodMin      = 400 * persons * days;
+    var minNeeded    = stayFactor + foodMin;
+
+    if (remaining <= 0 || remaining < minNeeded) {
+        // Show budget warning
+        var shortage = minNeeded - remaining;
+        document.getElementById('bwMsg').innerText =
+            'Your selected transport (' + _tsPicked.name + ') costs ₹' + transportCost.toLocaleString()
+            + ' for ' + persons + ' person(s) both ways. After transport, you have ₹'
+            + Math.max(0, remaining).toLocaleString()
+            + ' left — which is not enough to cover ' + days + ' day(s) of accommodation and food at ' + _tripFormData.dest + '.';
+
+        document.getElementById('bwBreakdown').innerHTML =
+            '<div class="budget-warn-row"><span class="bw-label">Total Budget</span><span class="bw-val">₹' + budget.toLocaleString() + '</span></div>'
+          + '<div class="budget-warn-row"><span class="bw-label">Transport Cost (both ways)</span><span class="bw-val red">− ₹' + transportCost.toLocaleString() + '</span></div>'
+          + '<div class="budget-warn-row"><span class="bw-label">Remaining Budget</span><span class="bw-val ' + (remaining > 0 ? '' : 'red') + '">₹' + Math.max(0,remaining).toLocaleString() + '</span></div>'
+          + '<div class="budget-warn-row"><span class="bw-label">Min. needed for ' + days + ' days</span><span class="bw-val">₹' + minNeeded.toLocaleString() + '</span></div>'
+          + '<div class="budget-warn-row"><span class="bw-label">Shortfall</span><span class="bw-val red">₹' + Math.max(0,shortage).toLocaleString() + '</span></div>';
+
+        showPage('budgetWarnPage');
+    } else {
+        // Budget OK — proceed to generate full AI plan
+        generateFullPlan(remaining);
+    }
+}
+
+function proceedAnyway() {
+    // User acknowledges low budget and wants to proceed
+    var budget      = _tripFormData.budget;
+    var remaining   = budget - (_tsPicked ? _tsPicked.price : 0);
+    generateFullPlan(Math.max(remaining, 0));
+}
+
+async function generateFullPlan(remainingBudget) {
+    var t = _tripFormData;
+    aiTripData = {
+        source: t.source, dest: t.dest, days: t.days,
+        budget: remainingBudget, style: t.style,
+        persons: t.persons, stay: t.stay,
+        transport: _tsPicked ? _tsPicked.name : 'Own arrangement'
+    };
+
+    var styleLabels = {
+        budget:'🎒 Budget Backpacker', comfort:'😊 Comfort Traveller',
+        luxury:'💎 Luxury Explorer', family:'👨‍👩‍👧 Family Trip',
+        adventure:'🧗 Adventure Seeker', spiritual:'🙏 Spiritual Journey'
+    };
+
+    document.getElementById("resSource").innerText      = t.source;
+    document.getElementById("resDestination").innerText = t.dest;
+    document.getElementById("resDays").innerText        = t.days;
+    document.getElementById("resPersons").innerText     = t.persons + (t.persons > 1 ? " persons" : " person");
+    document.getElementById("resBudget").innerText      = t.budget.toLocaleString();
+    document.getElementById("resStyle").innerText       = styleLabels[t.style] || t.style;
+    document.getElementById("resStay").innerText        = t.stay === 'relative' ? "🏠 Relative's House (Free Stay)" : "🏨 Hotel";
+    document.getElementById("resStay").style.color      = t.stay === 'relative' ? "#00c4a7" : "#fff";
+
+    ['itinerary','hotels','transport','food','budget'].forEach(function(tab) {
+        var sec = document.getElementById('section-' + tab);
+        sec.innerHTML = '<div class="tab-loading"><div class="mini-loader"></div> Loading...</div>';
+        sec.dataset.aiLoaded = 'false';
+        document.getElementById('tab-' + tab).classList.remove('active');
+        sec.classList.remove('open');
+    });
+    document.getElementById('tab-itinerary').classList.add('active');
+    document.getElementById('section-itinerary').classList.add('open');
+    document.getElementById('tripSummaryBody').innerHTML =
+        '<div class="ts-loading"><div class="mini-loader"></div> Building your trip summary...</div>';
+
+    showPage("processingPage");
+    document.getElementById("procStatus").innerText   = "Groq AI is crafting your full trip plan...";
+    startStatusCycle();
+
+    try {
+        await loadAiTab('itinerary');
+        stopStatusCycle();
+        showPage("resultPage");
+        loadTripSummary();
+    } catch(e) {
+        stopStatusCycle();
+        showPage("planPage");
+        document.getElementById("planError").innerText = "⚠️ Could not generate plan. Please try again.";
+    }
+}
+
+function switchAiTab(tab) {
+    ['itinerary','hotels','transport','food','budget'].forEach(function(t) {
+        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+        document.getElementById('section-' + t).classList.toggle('open', t === tab);
+    });
+    var sec = document.getElementById('section-' + tab);
+    if (sec.dataset.aiLoaded !== 'true') loadAiTab(tab);
+}
+
+async function loadTripSummary() {
+    var t = aiTripData;
+    var stayNote = t.stay === 'relative' ? "staying at relative's house (hotel cost = ₹0)" : "staying in a hotel";
+    var prompt = "You are a travel finance expert. Generate a Trip Summary for this trip:\n"
+        + "From: " + t.source + " → " + t.dest + " | Days: " + t.days
+        + " | Persons: " + t.persons + " | Total Budget: ₹" + parseInt(t.budget).toLocaleString()
+        + " | Style: " + t.style + " | " + stayNote + "\n\n"
+        + "Return ONLY a valid JSON object (no markdown, no backticks) with exactly these 8 keys:\n"
+        + "{\n"
+        + '  "travel_cost": "e.g. Rs.XXXX (Bus/Train/Flight for N persons)",\n'
+        + '  "hotel_cost": "e.g. Rs.XXXX (N nights at budget hotel near ...)" or "Rs.0 (Staying at relative\'s house)",\n'
+        + '  "food_activities": "e.g. Rs.XXXX (All meals + entry tickets for N persons for N days)",\n'
+        + '  "grand_total": "Rs.XXXX",\n'
+        + '  "balance_left": "Rs.XXXX (Reserve for emergencies or extra shopping)" — subtract grand_total from budget,\n'
+        + '  "must_carry": "Comma-separated practical items to carry",\n'
+        + '  "best_time": "Best months to visit ' + t.dest + ' with weather note",\n'
+        + '  "money_tip": "2-3 practical money-saving tips specific to ' + t.dest + '"\n'
+        + "}\nBe specific with ₹ amounts. Keep values concise but informative.";
+
+    try {
+        var raw = await callGemini(prompt, true);
+        raw = raw.replace(/```json|```/g, '').trim();
+        var jm = raw.match(/\{[\s\S]*\}/);
+        var s = JSON.parse(jm ? jm[0] : raw);
+        renderTripSummary(s);
+    } catch(e) {
+        document.getElementById('tripSummaryBody').innerHTML =
+            '<div class="ts-loading" style="color:#ff6b6b;">⚠️ ' + e.message + '</div>';
+    }
+}
+
+function renderTransportChooser(tr) {
+    var persons = aiTripData.persons || 1;
+    var budget  = parseInt(aiTripData.budget) || 10000;
+    var src     = (aiTripData.source || '').toUpperCase();
+    var dst     = (aiTripData.dest   || '').toUpperCase();
+    var html    = '';
+
+    // Header
+    html += '<div class="tr-chooser-title">Choose Transport</div>'
+          + '<div class="tr-chooser-meta">' + src + ' → ' + dst + ' · ' + persons + ' PERSON' + (persons > 1 ? 'S' : '') + ' · ₹' + budget.toLocaleString() + ' BUDGET</div>'
+          + '<div class="tr-chooser-sub">Select how you want to travel — price will be deducted from your budget</div>';
+
+    // No flights notice
+    var hasFlights = tr.flights && tr.flights.length > 0;
+    if (!hasFlights) {
+        html += '<div class="tr-no-flight-notice">✈ No direct flights for this route. Choose train or bus below.</div>';
+    }
+
+    // Selected bar
+    html += '<div class="tr-selected-bar" id="trSelectedBar">'
+          + '<span class="tr-selected-bar-text" id="trSelectedText"></span>'
+          + '<span class="tr-selected-bar-clear" onclick="clearTransportSel()">✕ Change</span>'
+          + '</div>';
+
+    // Build a card
+    var makeCard = function(id, icon, name, subname, duration, price, tag) {
+        var total = price * persons * 2;
+        var pct   = Math.round((total / budget) * 100);
+        var tagCls = (tag === 'Budget Pick') ? 'budget' : (tag === 'Fastest') ? 'fast' : 'comfort';
+        var tagIcon= (tag === 'Budget Pick') ? '💰' : (tag === 'Fastest') ? '⚡' : '😊';
+        var safeId = id.replace(/-/g,'_');
+        var safeName = name.replace(/'/g,"\\'");
+        return '<div class="tr-card" id="trCard-' + safeId + '" onclick="selectTr(\'' + safeId + '\',\'' + safeName + '\',' + total + ')">'
+             +   '<div class="tr-card-inner">'
+             +     '<div class="tr-card-top">'
+             +       '<div class="tr-card-icon">' + icon + '</div>'
+             +       '<div class="tr-card-main">'
+             +         '<div class="tr-card-name">' + esc(name) + '</div>'
+             +         '<div class="tr-card-sub">' + esc(subname) + '</div>'
+             +       '</div>'
+             +       '<div class="tr-card-price-block">'
+             +         '<div class="tr-card-price">₹' + price.toLocaleString() + '</div>'
+             +         '<div class="tr-card-price-label">per person, 1 way</div>'
+             +       '</div>'
+             +     '</div>'
+             +     '<div class="tr-card-chips">'
+             +       '<span class="tr-chip ' + tagCls + '">' + tagIcon + ' ' + esc(tag) + '</span>'
+             +       '<span class="tr-chip duration">🕐 ' + esc(duration) + '</span>'
+             +       '<span class="tr-chip pct">' + pct + '% of budget (both ways)</span>'
+             +     '</div>'
+             +   '</div>'
+             +   '<div class="tr-card-footer">'
+             +     '<span class="tr-card-footer-label">Total both ways (' + persons + ' person' + (persons > 1 ? 's' : '') + '):</span>'
+             +     '<span class="tr-card-footer-val">₹' + total.toLocaleString() + '</span>'
+             +   '</div>'
+             + '</div>';
+    };
+
+    // TRAINS
+    if (tr.trains && tr.trains.length) {
+        html += '<div class="transport-section-label">🚆 Trains <div class="tsl-line"></div></div>';
+        tr.trains.forEach(function(t, i) {
+            html += makeCard('train-' + i, '🚆', t.name, t.subname || t.name, t.duration, t.price || t.price_per_person || 0, t.tag || 'Comfortable');
+        });
+    }
+
+    // BUSES
+    if (tr.buses && tr.buses.length) {
+        html += '<div class="transport-section-label">🚌 Buses <div class="tsl-line"></div></div>';
+        tr.buses.forEach(function(b, i) {
+            html += makeCard('bus-' + i, '🚌', b.name, b.subname || b.name, b.duration, b.price || b.price_per_person || 0, b.tag || 'Comfortable');
+        });
+    }
+
+    // FLIGHTS
+    if (hasFlights) {
+        html += '<div class="transport-section-label">✈️ Flights <div class="tsl-line"></div></div>';
+        tr.flights.forEach(function(f, i) {
+            html += makeCard('flight-' + i, '✈️', f.name, f.subname || f.name, f.duration, f.price || f.price_per_person || 0, f.tag || 'Fastest');
+        });
+    }
+
+    // LOCAL TRANSPORT
+    if (tr.local) {
+        html += '<div class="transport-section-label">🛺 Local Transport in ' + esc(aiTripData.dest || '') + ' <div class="tsl-line"></div></div>';
+        html += '<div class="tr-local-box">' + esc(tr.local) + '</div>';
+    }
+
+    return html;
+}
+
+var _selTr = null;
+function selectTr(id, name, totalBothWays) {
+    // Deselect all
+    document.querySelectorAll('.tr-card').forEach(function(c) { c.classList.remove('selected'); });
+    // Select
+    var card = document.getElementById('trCard-' + id);
+    if (card) card.classList.add('selected');
+    _selTr = { id: id, name: name, total: totalBothWays };
+    var bar = document.getElementById('trSelectedBar');
+    bar.classList.add('show');
+    document.getElementById('trSelectedText').innerText =
+        '✅ ' + name + '  ·  ₹' + totalBothWays.toLocaleString() + ' both ways for ' + (aiTripData.persons || 1) + ' person(s)';
+    bar.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function clearTransportSel() {
+    document.querySelectorAll('.tr-card').forEach(function(c) { c.classList.remove('selected'); });
+    _selTr = null;
+    document.getElementById('trSelectedBar').classList.remove('show');
+}
+// keep old name working just in case
+function clearTransportSelection() { clearTransportSel(); }
+
+function renderTripSummary(s) {
+    document.getElementById('tripSummaryBody').innerHTML =
+        '<div class="ts-grid">'
+        + '<div class="ts-cell"><div class="ts-label">Travel Cost</div><div class="ts-value">' + esc(s.travel_cost) + '</div></div>'
+        + '<div class="ts-cell"><div class="ts-label">Hotel Cost</div><div class="ts-value">' + esc(s.hotel_cost) + '</div></div>'
+        + '<div class="ts-cell"><div class="ts-label">Food &amp; Activities</div><div class="ts-value">' + esc(s.food_activities) + '</div></div>'
+        + '<div class="ts-cell"><div class="ts-label">Grand Total</div><div class="ts-value highlight">' + esc(s.grand_total) + '</div></div>'
+        + '<div class="ts-cell"><div class="ts-label">Balance Left</div><div class="ts-value warn">' + esc(s.balance_left) + '</div></div>'
+        + '<div class="ts-cell"><div class="ts-label">Must Carry</div><div class="ts-value">' + esc(s.must_carry) + '</div></div>'
+        + '<div class="ts-cell full-width"><div class="ts-label">Best Time</div><div class="ts-value">' + esc(s.best_time) + '</div></div>'
+        + '<div class="ts-cell full-width" style="border-bottom:none;"><div class="ts-label">Money Tip</div><div class="ts-value">' + esc(s.money_tip) + '</div></div>'
+        + '</div>';
+}
+
+function getAiPrompt(tab) {
+    var t = aiTripData;
+    var stayNote = t.stay === 'relative'
+        ? "The traveller stays at a relative's house — accommodation cost is ₹0. Focus budget on food, transport and activities."
+        : "The traveller wants hotel/guesthouse accommodation.";
+    var ctx = "From: " + t.source + " | To: " + t.dest + " | Days: " + t.days
+        + " | Persons: " + t.persons + " | Budget: ₹" + parseInt(t.budget).toLocaleString()
+        + " (₹" + Math.round(t.budget / t.persons).toLocaleString() + "/person)"
+        + " | Style: " + t.style + " | " + stayNote;
+
+    var prompts = {
+        itinerary: "You are an expert Indian travel planner. Create a detailed " + t.days + "-day itinerary for a trip from " + t.source + " to " + t.dest + ".\n" + ctx + "\nGive a day-by-day plan with morning, afternoon and evening activities. Include specific place names, timings, and quick tips. Use Day 1, Day 2 etc. as headers. Use emojis for readability. End with 2-3 golden travel tips.",
+
+        hotels: t.stay === 'relative'
+            ? "The traveller is staying at a relative's house in " + t.dest + " — accommodation is FREE.\n" + ctx + "\nGive warm, practical advice: etiquette tips for being a good houseguest, what gifts to bring from " + t.source + ", how to explore independently, and how the saved accommodation money can be used for better experiences. Use emojis."
+            : "Recommend the best hotels/guesthouses in " + t.dest + " for a " + t.style + " traveller.\n" + ctx + "\nList 4-5 real hotels with name, price range per night (₹), key amenities, and who it's best for. Also mention booking platforms like MakeMyTrip, Goibibo, OYO. Use emojis.",
+
+        transport: "You are an Indian transport expert. Return ONLY raw JSON (absolutely no markdown, no backticks, no explanation text before or after). For travel from " + t.source + " to " + t.dest + " for " + t.persons + " person(s), return this exact JSON:\n{\"trains\":[{\"name\":\"Train Name 12345\",\"subname\":\"Class Name\",\"duration\":\"5h 30m\",\"price\":350,\"tag\":\"Budget Pick\"},{\"name\":\"Train Name 67890\",\"subname\":\"Class Name\",\"duration\":\"4h 0m\",\"price\":750,\"tag\":\"Comfortable\"}],\"buses\":[{\"name\":\"Operator AC Volvo\",\"subname\":\"Bus Type\",\"duration\":\"6h 0m\",\"price\":450,\"tag\":\"Comfortable\"},{\"name\":\"APSRTC Express\",\"subname\":\"Non-AC\",\"duration\":\"7h 0m\",\"price\":200,\"tag\":\"Budget Pick\"}],\"flights\":[],\"local\":\"Short paragraph about autos, cabs, metro inside " + t.dest + " with costs.\"}\nUse realistic Indian prices in ₹. If flights not practical leave empty array. Return 2 trains and 2 buses always.",
+
+        food: "Recommend must-try food in " + t.dest + " for a " + t.style + " traveller.\n" + ctx + "\nInclude: 5 iconic local dishes with ₹ prices, 3-4 famous restaurants or dhabas, street food spots, food tips (veg/non-veg, hygiene). Use emojis and make it mouth-watering!",
+
+        budget: "Create a detailed budget breakdown for this trip.\n" + ctx + "\nProvide a clear breakdown: Transport to/from, Local Transport, Accommodation, Food per day, Entry tickets, Shopping/misc. Show amounts in ₹ for all " + t.persons + " person(s). Add cost-saving tips. State if the budget is sufficient. " + (t.stay === 'relative' ? "Highlight savings from ₹0 accommodation." : "")
+    };
+    return prompts[tab];
+}
+
+async function loadAiTab(tab) {
+    var sec = document.getElementById('section-' + tab);
+    sec.innerHTML = '<div class="tab-loading"><div class="mini-loader"></div> Groq AI is generating your ' + tab + '...</div>';
+    sec.dataset.aiLoaded = 'false';
+    try {
+        var text = await callGemini(getAiPrompt(tab), false);
+
+        sec.innerHTML = '<div class="ai-content">' + formatAiText(text) + '</div>';
+        sec.dataset.aiLoaded = 'true';
+    } catch(e) {
+        sec.innerHTML = '<div class="ai-content" style="color:#ff6b6b;padding:16px;">⚠️ ' + e.message + '<br><small>Check your Groq API key in index.html</small></div>';
+    }
+}
+
+function formatAiText(text) {
+    var lines = text.split('\n'), html = '', inList = false;
+    lines.forEach(function(line) {
+        line = line.trim();
+        if (!line) { if (inList) { html += '</ul>'; inList = false; } return; }
+        if (/^day\s*\d+/i.test(line) || /^📅|^🗓/.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<div class="day-block"><h4>' + esc(line) + '</h4>'; return;
+        }
+        if (/^#{1,3}\s/.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<h' + (line.match(/^#+/)[0].length === 1 ? '3' : '4') + '>' + esc(line.replace(/^#+\s*/,'')) + '</h' + (line.match(/^#+/)[0].length === 1 ? '3' : '4') + '>'; return;
+        }
+        if (/^\*\*.*\*\*$/.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<h4>' + esc(line.replace(/\*\*/g,'')) + '</h4>'; return;
+        }
+        if (/^[-•*]\s/.test(line)) {
+            if (!inList) { html += '<ul>'; inList = true; }
+            html += '<li>' + inl(line.replace(/^[-•*]\s/,'')) + '</li>'; return;
+        }
+        if (/^\d+\.\s/.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<p style="margin:8px 0;color:#c8e4f0;">• ' + inl(line.replace(/^\d+\.\s/,'')) + '</p>'; return;
+        }
+        if (/^(💡|tip:|note:|pro tip:)/i.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<div class="tip-box">' + inl(line) + '</div>'; return;
+        }
+        if (/^---+$/.test(line)) {
+            if (inList) { html += '</ul>'; inList = false; }
+            html += '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:16px 0;">'; return;
+        }
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<p style="margin:6px 0;color:#c8e4f0;">' + inl(line) + '</p>';
+    });
+    if (inList) html += '</ul>';
+    return html;
+}
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function inl(s) {
+    return esc(s)
+        .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g,'<em style="color:#f4a261;font-style:normal;font-weight:700;">$1</em>')
+        .replace(/(₹[\d,]+)/g,'<span class="cost-badge">$1</span>');
+}
+
+showPage("loginPage");
+</script>
+</body>
+</html>
